@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -17,8 +17,6 @@ public class CardTips : MonoBehaviour
     [SerializeField]
     private CanvasGroup _tipCanvas;
 
-    [SerializeField, Space]
-    private Vector2Int _tipsPos;
 
     [SerializeField]
     private float _awaitTime;
@@ -44,7 +42,6 @@ public class CardTips : MonoBehaviour
     {
         gameObject.SetActive(true);
 
-        _tipRect.localPosition = new Vector2(0, _screenScaler.GetHeight(_tipsPos.y));
         _tipsText.text = textTip;
         if (instantly)
         {

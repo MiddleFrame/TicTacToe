@@ -105,8 +105,8 @@ namespace Cards.CustomType
             _cardTransformRect = GetComponent<RectTransform>();
             _cardCanvas = GetComponent<Canvas>();
             _cardCanvasGroup = GetComponent<CanvasGroup>();
-            _initScale = new Vector2(_screenScaler.GetWidthRatio(),
-                    _screenScaler.GetWidthRatio());
+            _initScale = new Vector2(1,
+                    1);
         }
 
         private void OnDisable()
@@ -193,9 +193,8 @@ namespace Cards.CustomType
         }
 
 
-        public void SetTransformParent(Transform parent, Vector2 position)
+        public void SetTransform(Vector2 position)
         {
-            _cardTransformRect.SetParent(parent);
             SetTransformPosition(position);
             _cardTransformRect.localScale = Vector3.one;
         }

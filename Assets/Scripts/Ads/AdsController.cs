@@ -1,5 +1,4 @@
-using UnityEngine;
-using Yodo1.MAS;
+﻿using UnityEngine;
 
 namespace Ads
 {
@@ -9,77 +8,10 @@ namespace Ads
        
         private void Start()
         {
-            Yodo1U3dMas.SetCOPPA(false);
-            Yodo1U3dMas.SetGDPR(true);
-            Yodo1U3dMas.SetCCPA(false);
-            Yodo1U3dMas.InitializeMasSdk();
 
-            Yodo1U3dMasCallback.OnSdkInitializedEvent += (success, error) =>
-            {
-                Debug.Log("[Yodo1 Mas] OnSdkInitializedEvent, success:" + success + ", error: " + error.ToString());
-                Debug.Log(success
-                    ? "[Yodo1 Mas] The initialization has succeeded"
-                    : "[Yodo1 Mas] The initialization has failed");
-            };
-
-            InitializeRewardedAds();
             Debug.Log("Ads init successful");
         }
 
-        #region Rewarded
-
-   
-        private void InitializeRewardedAds()
-        {
-            // Instantiate
-            Yodo1U3dRewardAd.GetInstance();
-
-            // Ad Events
-            Yodo1U3dRewardAd.GetInstance().OnAdLoadedEvent += OnRewardAdLoadedEvent;
-            Yodo1U3dRewardAd.GetInstance().OnAdLoadFailedEvent += OnRewardAdLoadFailedEvent;
-            Yodo1U3dRewardAd.GetInstance().OnAdOpenedEvent += OnRewardAdOpenedEvent;
-            Yodo1U3dRewardAd.GetInstance().OnAdOpenFailedEvent += OnRewardAdOpenFailedEvent;
-            Yodo1U3dRewardAd.GetInstance().OnAdClosedEvent += OnRewardAdClosedEvent;
-            Yodo1U3dRewardAd.GetInstance().OnAdEarnedEvent += OnRewardAdEarnedEvent;
-            Yodo1U3dRewardAd.GetInstance().LoadAd();
-        }
-
-        private void OnRewardAdLoadedEvent(Yodo1U3dRewardAd ad)
-        {
-            Debug.Log("[Yodo1 Mas] OnRewardAdLoadedEvent event received");
-        }
-
-        private void OnRewardAdLoadFailedEvent(Yodo1U3dRewardAd ad, Yodo1U3dAdError adError)
-        {
-            Debug.Log("[Yodo1 Mas] OnRewardAdLoadFailedEvent event received with error: " + adError.ToString());
-        }
-
-        private void OnRewardAdOpenedEvent(Yodo1U3dRewardAd ad)
-        {
-            Debug.Log("[Yodo1 Mas] OnRewardAdOpenedEvent event received");
-        }
-
-        private void OnRewardAdOpenFailedEvent(Yodo1U3dRewardAd ad, Yodo1U3dAdError adError)
-        {
-            Debug.Log("[Yodo1 Mas] OnRewardAdOpenFailedEvent event received with error: " + adError.ToString());
-            // Load the next ad
-            Yodo1U3dRewardAd.GetInstance().LoadAd();
-        }
-
-        private void OnRewardAdClosedEvent(Yodo1U3dRewardAd ad)
-        {
-            Debug.Log("[Yodo1 Mas] OnRewardAdClosedEvent event received");
-            // Load the next ad
-            Yodo1U3dRewardAd.GetInstance().LoadAd();
-        }
-
-        private void OnRewardAdEarnedEvent(Yodo1U3dRewardAd ad)
-        {
-            Debug.Log("[Yodo1 Mas] OnRewardAdEarnedEvent event received");
-            // Add your reward code here
-        }
-        
-        #endregion
         
         
 

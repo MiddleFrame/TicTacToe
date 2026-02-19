@@ -1,19 +1,41 @@
-using System;
+﻿using System;
 using System.Collections;
 using IAPurchasing.Interfaces;
 using UnityEngine;
+#if UNITY_IAP
 using UnityEngine.Purchasing;
+#endif
 
 namespace IAPurchasing
 {
-    public class IAPController : IStoreListener, IIAPService
+    public class IAPController: IIAPService
+        #if UNITY_IAP
+        , IStoreListener
+#endif
     {
         private const string BETATEST_BUNDLE = "betatest_bundle";
+
+        public void BuyProductID(string productId, Action action)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CheckBuyState(string id)
+        {
+            throw new NotImplementedException();
+        }
 
         public string GetBetatestBundleId()
         {
             return BETATEST_BUNDLE;
         }
+
+        public void IAPInitializate()
+        {
+            throw new NotImplementedException();
+        }
+
+        #if UNITY_IAP
 
         private Action _purchased;
         private IStoreController _storeController;
@@ -97,5 +119,6 @@ namespace IAPurchasing
                 }
             }
         }
+#endif
     }
 }

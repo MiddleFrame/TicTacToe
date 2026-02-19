@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cards.CustomType;
 using Cards.Interfaces;
 using UnityEngine;
@@ -31,14 +31,14 @@ namespace Cards
 
         #endregion
 
-        public List<CardModel> CreateDeck(int side)
+        public List<CardModel> CreateDeck(int side, Transform parent)
         {
             List<CardModel> newDeck = new List<CardModel>();
             foreach (CardInfo cardInfo in _cardList.GetCardList())
             {
                 for (int i = 0; i < cardInfo.CardCount; i++)
                 {
-                    CardModel cardModel = _diContainer.InstantiatePrefabForComponent<CardModel>(_cardModelPrefab);
+                    CardModel cardModel = _diContainer.InstantiatePrefabForComponent<CardModel>(_cardModelPrefab, parent);
                     //card.name = card.Info.CardName;
                     Debug.Log(cardModel);
                     cardModel.SetCardInfo(cardInfo, side);

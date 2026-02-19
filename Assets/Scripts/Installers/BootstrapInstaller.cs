@@ -1,4 +1,4 @@
-using Analytic;
+﻿using Analytic;
 using CardCollection;
 using Cards;
 using Coin;
@@ -107,6 +107,8 @@ public class BootstrapInstaller : MonoInstaller, IInitializable
         Application.targetFrameRate = 60;
         Container.Resolve<IVibrationService>().Init();
         Container.Resolve<ISettingsDataService>().LoadLanguage();
+#if UNITY_IAP
         Container.Resolve<IIAPService>().IAPInitializate();
+#endif
     }
 }

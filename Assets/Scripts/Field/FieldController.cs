@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.Interfaces;
@@ -25,6 +25,12 @@ namespace Field
 
         [SerializeField]
         private GameObject _cellParent;
+#if UNITY_EDITOR
+        [SerializeField]
+        private Camera Camera;
+        [SerializeField]
+        private ScreenScaler.ScreenScalerService scalerService = new ScreenScaler.ScreenScalerService();
+#endif
 
         [Space, Header("Screen properties"), SerializeField]
 
@@ -456,23 +462,26 @@ namespace Field
 
         private void OnDrawGizmos()
         {
-            if (!_isNeedGizmos) return;
-            float startPositionX = Camera.main
-                .ScreenToWorldPoint(
-                    new Vector3(_screenScaler.GetWidth(_screenBorderX.x), 0)).x;
-            float endPositionX = Camera.main.ScreenToWorldPoint(new Vector2(
-                _screenScaler.GetWidth(_screenScaler.GetScreenDefault().x - _screenBorderX.y), 0)).x;
 
-            float startPositionY = Camera.main.ScreenToWorldPoint(new Vector2(0,
-                _screenScaler.GetHeight(_screenBorderY.x))).y;
-            float endPositionY = Camera.main.ScreenToWorldPoint(new Vector2(0,
-                _screenScaler.GetHeight(
-                    _screenScaler.GetScreenDefault().y - _screenBorderY.y))).y;
+#if UNITY_EDITOR
+            if (!_isNeedGizmos) return;
+            float startPositionX = Camera
+                .ScreenToWorldPoint(
+                    new Vector3(scalerService.GetWidth(_screenBorderX.x), 0)).x;
+            float endPositionX = Camera.ScreenToWorldPoint(new Vector2(
+                scalerService.GetWidth(scalerService.GetScreenDefault().x - _screenBorderX.y), 0)).x;
+
+            float startPositionY = Camera.ScreenToWorldPoint(new Vector2(0,
+                scalerService.GetHeight(_screenBorderY.x))).y;
+            float endPositionY = Camera.ScreenToWorldPoint(new Vector2(0,
+                scalerService.GetHeight(
+                    scalerService.GetScreenDefault().y - _screenBorderY.y))).y;
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(new Vector2(startPositionX, startPositionY), new Vector2(endPositionX, startPositionY));
             Gizmos.DrawLine(new Vector2(endPositionX, startPositionY), new Vector2(endPositionX, endPositionY));
             Gizmos.DrawLine(new Vector2(endPositionX, endPositionY), new Vector2(startPositionX, endPositionY));
             Gizmos.DrawLine(new Vector2(startPositionX, endPositionY), new Vector2(startPositionX, startPositionY));
+#endif
         }
 
 

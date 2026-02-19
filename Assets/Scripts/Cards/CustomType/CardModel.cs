@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Cards.Enum;
 using Cards.Interfaces;
 using Field.Interfaces;
@@ -21,6 +21,9 @@ namespace Cards.CustomType
 
         private Vector2Int _chosenCell;
         private Vector2Int _prevChosenCell;
+        private RectTransform _parentRect;
+        private RectTransform _cardRect;
+        private Vector2 _fingerOffset;
 
         public Stopwatch Stopwatch => _stopWatch;
 
@@ -54,6 +57,9 @@ namespace Cards.CustomType
 
         private void Awake()
         {
+            _cardRect = GetComponent<RectTransform>();
+            _parentRect = _cardRect.parent as RectTransform;
+
             _cardView = GetComponent<CardView>();
         }
 
@@ -76,7 +82,16 @@ namespace Cards.CustomType
         {
             _cardView.SetCanvasOverrideSorting(true);
             _cardView.SetTransformScale(1, false);
-            _cardView.SetTransformPositionWithFingerDistance(Input.mousePosition, false);
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _parentRect,
+                Input.mousePosition,
+                Camera.main, // если Canvas = Screen Space Overlay
+                out var localPoint
+            );
+
+            _fingerOffset = (Vector2)_cardRect.localPosition - localPoint;
+
             _lastAlphaState = true;
             _chosenCell = new Vector2Int(-1, -1);
             SetTransformRotation(0);
@@ -92,7 +107,8 @@ namespace Cards.CustomType
                 Debug.Log(textTip);
                 _cardView.ShowTip(textTip, false);
             }
-            //if (SlotManager.Instance.IsCurrentPlayerOnSlot) SlotManager.Instance.ShowRechanger();
+
+            
         }
 
         /// <summary>
@@ -104,7 +120,15 @@ namespace Cards.CustomType
 
             Vector2 vectorFigure = _cardView.GetPositionWithDistance(Input.mousePosition);
 
-            SetTransformPositionWithFingerDistance(Input.mousePosition);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+     _parentRect,
+     Input.mousePosition,
+     Camera.main,
+     out var localPoint
+ );
+
+            _cardRect.localPosition = localPoint + _fingerOffset;
+
 
             if (_fieldService.IsInFieldHeight(vectorFigure.y) && !_isSlotsReUpdatePositions)
             {
@@ -216,14 +240,14 @@ namespace Cards.CustomType
             _cardView.SetTransformScale(reals, instantly);
         }
 
-        public void SetTransformParent(Transform parent)
+        public void SetTransform()
         {
-            _cardView.SetTransformParent(parent, Vector2.zero);
+            _cardView.SetTransform(Vector2.zero);
         }
 
-        public void SetTransformParent(Transform parent, Vector2 position)
+        public void SetTransform(Vector2 position)
         {
-            _cardView.SetTransformParent(parent, position);
+            _cardView.SetTransform(position);
         }
 
         public void SetSibling(int id)

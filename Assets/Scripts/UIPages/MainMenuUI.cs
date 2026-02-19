@@ -1,4 +1,4 @@
-using Analytic.Interfaces;
+﻿using Analytic.Interfaces;
 using Cards.Interfaces;
 using Coin.Interfaces;
 using GameScene;
@@ -84,8 +84,7 @@ namespace UIPages
         {
             _matchEventsAnalyticService.Player_Start_Match(GameType.SingleAI, _cardList.GetCardList());
             _gameTypeService.SetGameType(GameType.SingleAI);
-            _gameSceneService.BeginLoadGameScene(GameSceneManager.GameScene.Game);
-            _gameSceneService.BeginTransaction();
+            _gameSceneService.LoadGameScene(GameSceneManager.GameScene.Game);
         }
 
 
@@ -93,14 +92,12 @@ namespace UIPages
         {
             _matchEventsAnalyticService.Player_Start_Match(GameType.SingleHuman, _cardList.GetCardList());
             _gameTypeService.SetGameType(GameType.SingleHuman);
-            _gameSceneService.BeginLoadGameScene(GameSceneManager.GameScene.Game);
-            _gameSceneService.BeginTransaction();
+            _gameSceneService.LoadGameScene(GameSceneManager.GameScene.Game);
         }
 
         public void OnTutorialButtonClick()
         {
-            _gameSceneService.BeginLoadGameScene(GameSceneManager.GameScene.Tutorial);
-            _gameSceneService.BeginTransaction();
+            _gameSceneService.LoadGameScene(GameSceneManager.GameScene.Tutorial);
         }
 
         private void ChangeMultiplayerButtonState(bool state)

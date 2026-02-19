@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cards.CustomType;
@@ -93,10 +93,6 @@ namespace Cards
 
         public int MaxCardHand => SLOTS_COUNT;
 
-        private void Start()
-        {
-            _rechangerRect.sizeDelta = _screenScaler.GetVector(_rechangerRect.sizeDelta);
-        }
 
         public void AddCard(PlayerInfo player)
         {
@@ -136,6 +132,8 @@ namespace Cards
 
         public void UpdateCardPosition(bool instantly = true, CardModel cardModel = null)
         {
+            Debug.Log("Update card pool");
+
             float currentCount = _currentPlayerView.HandPool.Count;
             int curIndex = _currentPlayerView.HandPool.IndexOf(cardModel);
             if (curIndex != -1)
@@ -146,30 +144,38 @@ namespace Cards
                 _currentPlayerView.HandPool.Add(cardModel);
             }
 
-            float positionY =
-                _screenScaler.GetHeight(_buttonBorder + ((IsCurrentPlayerOnSlot()) ? _heightLift : 0));
+            float count = currentCount;
 
-            float stepPos = (_screenScaler.GetScreenDefault().x - _widthBorder * 2 + _widthCard * currentCount) /
-                            (currentCount + 1);
-            float stepRot = (_angleDelta * 2) / (currentCount + 1);
+            float positionY = 
+                _buttonBorder + (IsCurrentPlayerOnSlot() ? _heightLift : 0);
+
+            float overlapPercent = 1f;
+            float step = _widthCard * overlapPercent;
 
 
-            for (int i = 0; i < currentCount; i++)
+            float totalWidth = step * (count - 1);
+            float startX = -totalWidth / 2f;
+
+            for (int i = 0; i < count; i++)
             {
-                float posY = positionY + (Mathf.Sin(Mathf.PI * (i + 1) / (currentCount + 1))) * _heightDelta *
-                    _screenScaler.GetHeightRatio();
-                Vector2 finPosition =
-                    new Vector2(
-                        (_widthBorder + stepPos * (i + 1) - _widthCard * currentCount / 2) *
-                        _screenScaler.GetWidthRatio(), posY);
-                // if (_currentPlayerView.HandPool[i].transform.parent != _cardTransformParent)
-                //     _currentPlayerView.HandPool[i].SetTransformParent(_cardTransformParent, _startPoint);
-                _currentPlayerView.HandPool[i].SetTransformScale(0.7f, instantly);
-                _currentPlayerView.HandPool[i].SetSibling(i);
-                _currentPlayerView.HandPool[i].SetTransformPosition(finPosition, instantly);
-                _currentPlayerView.HandPool[i].SetTransformRotation(_angleDelta - stepRot * (i + 1), instantly);
-                _currentPlayerView.HandPool[i]
-                    .SetSideCard(_currentPlayerView.HandPool[i].Info, _currentPlayerView.SideId);
+                float x = startX + step * i;
+
+                float curveStrength = 0.4f;
+                float posY = positionY +
+                             Mathf.Sin(Mathf.PI * i / ((count==1?0:count) - 1)) *
+                             _heightDelta * curveStrength;
+
+
+                Vector2 finalPos = new Vector2(x, posY);
+
+                var card = _currentPlayerView.HandPool[i];
+
+                card.SetTransformScale(0.7f, instantly);
+                card.SetSibling(i);
+                card.SetTransformPosition(finalPos, instantly);
+
+                float angle = _angleDelta - (_angleDelta * 2f / ((count == 1 ? 0 : count) - 1)) * i;
+                card.SetTransformRotation(angle, instantly);
             }
         }
 
@@ -251,10 +257,10 @@ namespace Cards
 
         public List<CardModel> CreateCardPull(int side)
         {
-            List<CardModel> list = _cardFactory.CreateDeck(side);
+            List<CardModel> list = _cardFactory.CreateDeck(side, _cardTransformParent);
             _startPoint = _screenScaler.GetVector(new Vector2(_widthBorder, _buttonBorder) + _startPointDelta);
             foreach (CardModel card in list)
-                card.SetTransformParent(_cardTransformParent, _startPoint);
+                card.SetTransform(_startPoint);
             return list;
         }
 

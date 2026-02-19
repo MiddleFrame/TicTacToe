@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using ModestTree.Util;
@@ -46,7 +46,6 @@ public static class TransformExtensions
         while (frame <= countFrame)
         {
             var percentage = (float) frame / (float) countFrame;
-            Debug.Log($"Movement. Per: {percentage}, Lerp: {Vector2.Lerp(initalPosition, finalPosition, percentage)}");
             transform.localPosition = Vector2.Lerp(initalPosition, finalPosition, percentage);
             frame += 1;
             yield return null;

@@ -1,4 +1,4 @@
-using GameScene.Interfaces;
+﻿using GameScene.Interfaces;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -34,6 +34,24 @@ namespace GameScene
             _currentAsyncLoad = "";
             _asyncOperation.allowSceneActivation = true;
             _asyncOperation = null;
+        }
+
+
+        public void LoadGameScene(GameScene state)
+        {
+            switch (state)
+            {
+                case GameScene.Game:
+                    SceneManager.LoadScene("GameplayScene");
+                    break;
+                case GameScene.MainMenu:
+                    SceneManager.LoadScene("MainMenu");
+                    break;
+                case GameScene.Tutorial:
+                    SceneManager.LoadScene("TutorialScene");
+                    break;
+            }
+
         }
 
         public enum GameScene

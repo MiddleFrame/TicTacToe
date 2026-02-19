@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<versions>
-  <unity env="Release" version="4.10.0" />
-  <android env="Release" version="4.10.0" />
-  <ios env="Release" version="4.10.0" />
-</versions>

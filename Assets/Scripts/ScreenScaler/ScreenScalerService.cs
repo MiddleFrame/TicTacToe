@@ -1,4 +1,4 @@
-using ScreenScaler.Interfaces;
+﻿using ScreenScaler.Interfaces;
 using UnityEngine;
 
 namespace ScreenScaler
@@ -6,7 +6,7 @@ namespace ScreenScaler
 
     public class ScreenScalerService : IScreenScaler
     {
-        private readonly Vector2 _screenDefault = new(720, 1280);
+        private readonly Vector2 _screenDefault = new(1080, 1920);
 
         public Vector2 GetScreenDefault()
         {
