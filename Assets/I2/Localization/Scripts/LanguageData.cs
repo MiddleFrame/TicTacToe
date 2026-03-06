@@ -1,8 +1,4 @@
 using System;
-using UnityEngine;
-using System.Linq;
-using System.Collections.Generic;
-using Object = UnityEngine.Object;
 
 namespace I2.Loc
 {
@@ -26,7 +22,7 @@ namespace I2.Loc
 
         public void SetEnabled( bool bEnabled )
         {
-            if (bEnabled) Flags = (byte)(Flags & (~(int)eLanguageDataFlags.DISABLED));
+            if (bEnabled) Flags = (byte)(Flags & ~(int)eLanguageDataFlags.DISABLED);
                      else Flags = (byte)(Flags | (int)eLanguageDataFlags.DISABLED);
         }
 
@@ -35,12 +31,12 @@ namespace I2.Loc
 
 		public void SetLoaded ( bool loaded ) 
 		{
-			if (loaded) Flags = (byte)(Flags & (~(int)eLanguageDataFlags.NOT_LOADED));
+			if (loaded) Flags = (byte)(Flags & ~(int)eLanguageDataFlags.NOT_LOADED);
 	  			   else Flags = (byte)(Flags | (int)eLanguageDataFlags.NOT_LOADED);
 		}
         public void SetCanBeUnLoaded(bool allowUnloading)
         {
-            if (allowUnloading) Flags = (byte)(Flags & (~(int)eLanguageDataFlags.KEEP_LOADED));
+            if (allowUnloading) Flags = (byte)(Flags & ~(int)eLanguageDataFlags.KEEP_LOADED);
                            else Flags = (byte)(Flags | (int)eLanguageDataFlags.KEEP_LOADED);
         }
     }

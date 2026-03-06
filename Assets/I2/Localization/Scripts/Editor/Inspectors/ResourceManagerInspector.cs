@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace I2.Loc
 {
@@ -20,7 +20,7 @@ namespace I2.Loc
 			GUITools.DrawHeader("Assets:", true);
 			GUITools.BeginContents();
 				///GUILayout.Label ("Assets:");
-				GUITools.DrawObjectsArray( mAssets, false, false, false );
+				GUITools.DrawObjectsArray( mAssets );
 			GUITools.EndContents();
 
 			serializedObject.ApplyModifiedProperties();

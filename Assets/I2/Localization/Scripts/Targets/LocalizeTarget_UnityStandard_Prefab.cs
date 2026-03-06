@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
+
 #pragma warning disable 618
 
 namespace I2.Loc
@@ -9,13 +11,13 @@ namespace I2.Loc
     }
 
     #if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoad] 
+    [InitializeOnLoad] 
     #endif
 
     public class LocalizeTarget_UnityStandard_Prefab : LocalizeTarget<GameObject>
     {
         static LocalizeTarget_UnityStandard_Prefab() { AutoRegister(); }
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Prefab() { Name = "Prefab", Priority = 250 }); }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Prefab { Name = "Prefab", Priority = 250 }); }
 
         public override bool IsValid(Localize cmp) { return true; }
         public override eTermType GetPrimaryTermType(Localize cmp) { return eTermType.GameObject; }
@@ -57,9 +59,9 @@ namespace I2.Loc
                 {
                     #if UNITY_EDITOR
                         if (Application.isPlaying)
-                            Object.Destroy(child.gameObject);
+                            Destroy(child.gameObject);
                         else
-                            Object.DestroyImmediate(child.gameObject);
+                            DestroyImmediate(child.gameObject);
                     #else
 				        Object.Destroy (child.gameObject);
                     #endif
@@ -73,17 +75,17 @@ namespace I2.Loc
             if (NewPrefab == null)
                 return null;
 
-            GameObject current = mTarget as GameObject;
+            GameObject current = mTarget;
 
-            mTarget = Object.Instantiate(NewPrefab);
+            mTarget = Instantiate(NewPrefab);
             if (mTarget == null)
                 return null;
 
             Transform locTr = cmp.transform;
-            Transform mNew = (mTarget as GameObject).transform;
+            Transform mNew = mTarget.transform;
             mNew.SetParent(locTr);
 
-            Transform bBase = (current ? current.transform : locTr);
+            Transform bBase = current ? current.transform : locTr;
             //mNew.localScale = bBase.localScale;
             mNew.rotation = bBase.rotation;
             mNew.position = bBase.position;

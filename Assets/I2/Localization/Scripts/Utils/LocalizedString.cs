@@ -18,7 +18,7 @@ namespace I2.Loc
 
         public static implicit operator LocalizedString(string term)
         {
-            return new LocalizedString() { mTerm = term };
+            return new LocalizedString { mTerm = term };
         }
 
         public LocalizedString (LocalizedString str)

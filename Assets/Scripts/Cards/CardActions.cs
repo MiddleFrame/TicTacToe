@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using AI.Interfaces;
 using Area.Interfaces;
@@ -410,6 +410,7 @@ namespace Cards
                                                   (CellFigure) _playerService.GetCurrentPlayer().SideId),
                 _ => false
             };
+
 
             bool isInvokeExist = typeFlag && timeFlag && manaFlag && animFlag && playerFlag;
 

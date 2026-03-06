@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Linq;
 using System.Globalization;
-using System.Collections;
+using System.Linq;
+using System.Threading;
 
 namespace I2.Loc
 {
@@ -56,8 +55,7 @@ namespace I2.Loc
                 int idx2 = Lan.LastIndexOfAny("])".ToCharArray());
                 if (idx > 0 && idx != idx2)
                     return Lan.Substring(idx + 1, idx2 - idx - 1);
-                else
-                    return string.Empty;
+                return string.Empty;
             }
             set {
                 var Lan = CurrentLanguage;
@@ -106,10 +104,10 @@ namespace I2.Loc
         static string mCurrentLanguage;
         static string mLanguageCode;
         static CultureInfo mCurrentCulture;
-        static bool mChangeCultureInfo = false;
+        static bool mChangeCultureInfo;
 
-        public static bool IsRight2Left = false;
-        public static bool HasJoinedWords = false;  // Some languages (e.g. Chinese, Japanese and Thai) don't add spaces to their words (all characters are placed toguether)
+        public static bool IsRight2Left;
+        public static bool HasJoinedWords;  // Some languages (e.g. Chinese, Japanese and Thai) don't add spaces to their words (all characters are placed toguether)
 
         #endregion
 
@@ -138,7 +136,7 @@ namespace I2.Loc
             {
                 return CultureInfo.CreateSpecificCulture(code);
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return CultureInfo.InvariantCulture;
             }
@@ -157,7 +155,7 @@ namespace I2.Loc
         static void SetCurrentCultureInfo()
         {
             #if !NETFX_CORE
-                System.Threading.Thread.CurrentThread.CurrentCulture = mCurrentCulture;
+                Thread.CurrentThread.CurrentCulture = mCurrentCulture;
             #endif
         }
 
@@ -232,7 +230,7 @@ namespace I2.Loc
 		public static string GetSupportedLanguage( string Language, bool ignoreDisabled=false )
 		{
             // First try finding the language that matches one of the official languages
-            string code = GoogleLanguages.GetLanguageCode(Language, false);
+            string code = GoogleLanguages.GetLanguageCode(Language);
             if (!string.IsNullOrEmpty(code))
             {
                 // First try finding if the exact language code is in one source

@@ -1,8 +1,12 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace I2.Loc
 {	
@@ -104,7 +108,7 @@ namespace I2.Loc
 						OnToggle(newBool);
 				}
 				GUILayout.EndHorizontal();
-				GUI.color = GUITools.White;
+				GUI.color = White;
 			}
 			return state;
 		}
@@ -246,7 +250,7 @@ namespace I2.Loc
 			//width = Mathf.Max (width, height * Tabs[0].width/(float)Tabs[0].height);
 
 			GUILayout.BeginHorizontal();
-			float width = (EditorGUIUtility.currentViewWidth-(MyStyle.border.left+MyStyle.border.right)*(Tabs.Length-1)) / (float)Tabs.Length;
+			float width = (EditorGUIUtility.currentViewWidth-(MyStyle.border.left+MyStyle.border.right)*(Tabs.Length-1)) / Tabs.Length;
 			for (int i=0; i<Tabs.Length; ++i)
 			{
 				if ( GUILayout.Toggle(Index==i, Tabs[i], MyStyle, GUILayout.Height(height), GUILayout.Width(width)) && Index!=i) 
@@ -554,7 +558,7 @@ namespace I2.Loc
 			
 			float delta;
 			if (min != max)
-				delta = ((max - min) / 360);
+				delta = (max - min) / 360;
 			else
 				delta = 1;
 			
@@ -576,7 +580,7 @@ namespace I2.Loc
 					{
 						float mod = value % snap;
 						
-						if (mod < (delta * 3) || Mathf.Abs(mod - snap) < (delta * 3))
+						if (mod < delta * 3 || Mathf.Abs(mod - snap) < delta * 3)
 							value = Mathf.Round(value / snap) * snap;
 					}
 					
@@ -598,7 +602,7 @@ namespace I2.Loc
 			if (pAngle_TextureCircle) GUI.DrawTexture(knobRect, pAngle_TextureCircle);
 			GUI.matrix = matrix;
 			
-			Rect label = new Rect(rect.x + rect.height, rect.y + (rect.height / 2) - 9, rect.height, 18);
+			Rect label = new Rect(rect.x + rect.height, rect.y + rect.height / 2 - 9, rect.height, 18);
 			value = EditorGUI.FloatField(label, value);
 			
 			if (min != max)
@@ -613,7 +617,7 @@ namespace I2.Loc
 			
 			float delta;
 			if (min != max)
-				delta = ((max - min) / 360);
+				delta = (max - min) / 360;
 			else
 				delta = 1;
 
@@ -627,7 +631,7 @@ namespace I2.Loc
 				{
 					float mod = Mathf.Repeat(angle, snap);
 					
-					if (mod < (delta * 3) || Mathf.Abs(mod - snap) < (delta * 3))
+					if (mod < delta * 3 || Mathf.Abs(mod - snap) < delta * 3)
 						angle = Mathf.Round(angle / snap) * snap;
 				}
 				
@@ -665,14 +669,14 @@ namespace I2.Loc
 			#if UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 				return EditorApplication.currentScene;
 			#else
-				return UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path;
+				return SceneManager.GetActiveScene().path;
 			#endif
 		}
 
         public static void Editor_MarkSceneDirty()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             #else
                 EditorApplication.MarkSceneDirty();
             #endif
@@ -683,7 +687,7 @@ namespace I2.Loc
 			#if UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 			EditorApplication.SaveScene ();
 			#else
-			UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
+			EditorSceneManager.SaveOpenScenes();
 			#endif
 		}
 
@@ -692,7 +696,7 @@ namespace I2.Loc
 			#if UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 			EditorApplication.OpenScene( sceneName );
 			#else
-			UnityEditor.SceneManagement.EditorSceneManager.OpenScene(sceneName);
+			EditorSceneManager.OpenScene(sceneName);
 			#endif
 		}
 
@@ -706,7 +710,7 @@ namespace I2.Loc
 			if (mi == null) return null;
 			return mi.Invoke( instanceObject, p_args );
 		}
-		static public object Reflection_InvokeMethod ( System.Type targetType, string methodName, params object[] p_args )
+		static public object Reflection_InvokeMethod ( Type targetType, string methodName, params object[] p_args )
 		{
 			BindingFlags _flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
 			MethodInfo mi = targetType.GetMethods( _flags ).Where( x => x.Name==methodName ).FirstOrDefault();
@@ -721,7 +725,7 @@ namespace I2.Loc
             if (s_RecycledEditor==null)
             {
                 FieldInfo info = typeof(EditorGUI).GetField("s_RecycledEditor", BindingFlags.NonPublic | BindingFlags.Static);
-                s_RecycledEditor = info.GetValue(null);
+                s_RecycledEditor = info == null ? null : info.GetValue(null);
             }
 
             if (s_RecycledEditor == null)
@@ -745,5 +749,15 @@ namespace I2.Loc
 
 
         #endregion
-    }
+        
+		#if UNITY_2022_3_OR_NEWER
+			public const string Style_ToolbarSearchTextField = "ToolbarSearchTextField";
+			public const string Style_ToolbarSearchCancelButtonEmpty = "ToolbarSearchCancelButtonEmpty";
+			public const string Style_ToolbarSearchCancelButton = "ToolbarSearchCancelButton";
+		#else
+			public const string Style_ToolbarSearchTextField = "ToolbarSeachTextField";
+			public const string Style_ToolbarSearchCancelButtonEmpty = "ToolbarSeachCancelButtonEmpty";
+			public const string Style_ToolbarSearchCancelButton = "ToolbarSeachCancelButton";
+		#endif        
+	}
 }

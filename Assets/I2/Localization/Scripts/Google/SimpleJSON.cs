@@ -47,8 +47,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
-
 
 namespace I2.Loc.SimpleJSON
 {
@@ -60,7 +61,7 @@ namespace I2.Loc.SimpleJSON
 		IntValue        = 4,
 		DoubleValue        = 5,
 		BoolValue        = 6,
-		FloatValue        = 7,
+		FloatValue        = 7
 	}
 	
 	public class JSONNode
@@ -157,7 +158,7 @@ namespace I2.Loc.SimpleJSON
 			}
 			set
 			{
-				Value = (value)?"true":"false";
+				Value = value?"true":"false";
 			}
 		}
 		public virtual JSONArray AsArray
@@ -185,7 +186,7 @@ namespace I2.Loc.SimpleJSON
 		}
 		public static implicit operator string(JSONNode d)
 		{
-			return (d == null)?null:d.Value;
+			return d == null?null:d.Value;
 		}
 		public static bool operator ==(JSONNode a, object b)
 		{
@@ -364,7 +365,7 @@ namespace I2.Loc.SimpleJSON
 						case 'u':
 						{
 							string s = aJSON.Substring(i+1,4);
-							Token += (char)int.Parse(s, System.Globalization.NumberStyles.AllowHexSpecifier);
+							Token += (char)int.Parse(s, NumberStyles.AllowHexSpecifier);
 							i += 4;
 							break;
 						}
@@ -386,11 +387,11 @@ namespace I2.Loc.SimpleJSON
 			return ctx;
 		}
 		
-		public virtual void Serialize(System.IO.BinaryWriter aWriter) {}
+		public virtual void Serialize(BinaryWriter aWriter) {}
 		
-		public void SaveToStream(System.IO.Stream aData)
+		public void SaveToStream(Stream aData)
 		{
-			var W = new System.IO.BinaryWriter(aData);
+			var W = new BinaryWriter(aData);
 			Serialize(W);
 		}
 		
@@ -428,7 +429,7 @@ namespace I2.Loc.SimpleJSON
 		}
 		
 		#else
-		public void SaveToCompressedStream(System.IO.Stream aData)
+		public void SaveToCompressedStream(Stream aData)
 		{
 			throw new Exception("Can't use compressed functions. You need include the SharpZipLib and uncomment the define at the top of SimpleJSON");
 		}
@@ -445,8 +446,8 @@ namespace I2.Loc.SimpleJSON
 		public void SaveToFile(string aFileName)
 		{
 			#if USE_FileIO
-			System.IO.Directory.CreateDirectory((new System.IO.FileInfo(aFileName)).Directory.FullName);
-			using(var F = System.IO.File.OpenWrite(aFileName))
+			Directory.CreateDirectory(new FileInfo(aFileName).Directory.FullName);
+			using(var F = File.OpenWrite(aFileName))
 			{
 				SaveToStream(F);
 			}
@@ -456,14 +457,14 @@ namespace I2.Loc.SimpleJSON
 		}
 		public string SaveToBase64()
 		{
-			using (var stream = new System.IO.MemoryStream())
+			using (var stream = new MemoryStream())
 			{
 				SaveToStream(stream);
 				stream.Position = 0;
 				return Convert.ToBase64String(stream.ToArray());
 			}
 		}
-		public static JSONNode Deserialize(System.IO.BinaryReader aReader)
+		public static JSONNode Deserialize(BinaryReader aReader)
 		{
 			JSONBinaryTag type = (JSONBinaryTag)aReader.ReadByte();
 			switch(type)
@@ -545,7 +546,7 @@ namespace I2.Loc.SimpleJSON
 		{
 			throw new Exception("Can't use compressed functions. You need include the SharpZipLib and uncomment the define at the top of SimpleJSON");
 		}
-		public static JSONNode LoadFromCompressedStream(System.IO.Stream aData)
+		public static JSONNode LoadFromCompressedStream(Stream aData)
 		{
 			throw new Exception("Can't use compressed functions. You need include the SharpZipLib and uncomment the define at the top of SimpleJSON");
 		}
@@ -555,9 +556,9 @@ namespace I2.Loc.SimpleJSON
 		}
 		#endif
 		
-		public static JSONNode LoadFromStream(System.IO.Stream aData)
+		public static JSONNode LoadFromStream(Stream aData)
 		{
-			using(var R = new System.IO.BinaryReader(aData))
+			using(var R = new BinaryReader(aData))
 			{
 				return Deserialize(R);
 			}
@@ -565,7 +566,7 @@ namespace I2.Loc.SimpleJSON
 		public static JSONNode LoadFromFile(string aFileName)
 		{
 			#if USE_FileIO
-			using(var F = System.IO.File.OpenRead(aFileName))
+			using(var F = File.OpenRead(aFileName))
 			{
 				return LoadFromStream(F);
 			}
@@ -576,7 +577,7 @@ namespace I2.Loc.SimpleJSON
 		public static JSONNode LoadFromBase64(string aBase64)
 		{
 			var tmp = Convert.FromBase64String(aBase64);
-			var stream = new System.IO.MemoryStream(tmp);
+			var stream = new MemoryStream(tmp);
 			stream.Position = 0;
 			return LoadFromStream(stream);
 		}
@@ -665,7 +666,7 @@ namespace I2.Loc.SimpleJSON
 			result += "\n" + aPrefix + "]";
 			return result;
 		}
-		public override void Serialize (System.IO.BinaryWriter aWriter)
+		public override void Serialize (BinaryWriter aWriter)
 		{
 			aWriter.Write((byte)JSONBinaryTag.Array);
 			aWriter.Write(m_List.Count);
@@ -685,8 +686,7 @@ namespace I2.Loc.SimpleJSON
 			{
 				if (m_Dict.ContainsKey(aKey))
 					return m_Dict[aKey];
-				else
-					return new JSONLazyCreator(this, aKey);
+				return new JSONLazyCreator(this, aKey);
 			}
 			set
 			{
@@ -819,7 +819,7 @@ namespace I2.Loc.SimpleJSON
 			{
 				if (result.Length > 2)
 					result += ", ";
-				result += "\"" + Escape(N.Key) + "\":" + N.Value.ToString();
+				result += "\"" + Escape(N.Key) + "\":" + N.Value;
 			}
 			result += "}";
 			return result;
@@ -837,7 +837,7 @@ namespace I2.Loc.SimpleJSON
 			result += "\n" + aPrefix + "}";
 			return result;
 		}
-		public override void Serialize (System.IO.BinaryWriter aWriter)
+		public override void Serialize (BinaryWriter aWriter)
 		{
 			aWriter.Write((byte)JSONBinaryTag.Class);
 			aWriter.Write(m_Dict.Count);
@@ -886,7 +886,7 @@ namespace I2.Loc.SimpleJSON
 		{
 			return "\"" + Escape(m_Data) + "\"";
 		}
-		public override void Serialize (System.IO.BinaryWriter aWriter)
+		public override void Serialize (BinaryWriter aWriter)
 		{
 			var tmp = new JSONData("");
 			
@@ -926,8 +926,8 @@ namespace I2.Loc.SimpleJSON
 	
 	internal class JSONLazyCreator : JSONNode
 	{
-		private JSONNode m_Node = null;
-		private string m_Key = null;
+		private JSONNode m_Node;
+		private string m_Key;
 		
 		public JSONLazyCreator(JSONNode aNode)
 		{

@@ -1,6 +1,7 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace I2.Loc
 {
@@ -69,7 +70,7 @@ namespace I2.Loc
 					GUILayout.BeginHorizontal();
 						OnGUI_CategorizedTerm(mSelectedKeys[i]);
 
-						if (DoubleColumn && (i+HalfCount<mSelectedKeys.Count))
+						if (DoubleColumn && i+HalfCount<mSelectedKeys.Count)
 							OnGUI_CategorizedTerm(mSelectedKeys[i+HalfCount]);
 					GUILayout.EndHorizontal();
 				}
@@ -131,7 +132,7 @@ namespace I2.Loc
 
 		#region Assigning Category
 
-		public static Dictionary<string, string> TermReplacements = null;
+		public static Dictionary<string, string> TermReplacements;
 
 		void AssignCategoryToSelectedTerms()
 		{
@@ -144,7 +145,7 @@ namespace I2.Loc
 			if (mNewCategory==LanguageSourceData.EmptyCategory)
 				mNewCategory = string.Empty;
 
-			TermReplacements = new Dictionary<string, string>(System.StringComparer.Ordinal);
+			TermReplacements = new Dictionary<string, string>(StringComparer.Ordinal);
 			for (int i=mSelectedKeys.Count-1; i>=0; --i)
 			{
 				string sKey, sCategory;

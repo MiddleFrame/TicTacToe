@@ -1,10 +1,9 @@
-﻿using UnityEngine;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Linq;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace I2.Loc
@@ -133,20 +132,18 @@ namespace I2.Loc
             try
             {
                 // This is a Hack for reading Google Translation while Google doens't change their response format
-                int iStart = html.IndexOf("TRANSLATED_TEXT='") + "TRANSLATED_TEXT='".Length;
-                int iEnd = html.IndexOf("';var", iStart);
+                int iStart = html.IndexOf("TRANSLATED_TEXT='", StringComparison.Ordinal) + "TRANSLATED_TEXT='".Length;
+                int iEnd = html.IndexOf("';var", iStart, StringComparison.Ordinal);
 
                 string Translation = html.Substring( iStart, iEnd-iStart);
 
                 // Convert to normalized HTML
-                Translation = System.Text.RegularExpressions.Regex.Replace(Translation,
-                                                                            @"\\x([a-fA-F0-9]{2})",
-                                                                            match => char.ConvertFromUtf32(Int32.Parse(match.Groups[1].Value, System.Globalization.NumberStyles.HexNumber)));
+                Translation = Regex.Replace(Translation, @"\\x([a-fA-F0-9]{2})",
+                                                            match => char.ConvertFromUtf32(int.Parse(match.Groups[1].Value, NumberStyles.HexNumber)));
 
                 // Convert ASCII Characters
-                Translation = System.Text.RegularExpressions.Regex.Replace(Translation,
-                                                                            @"&#(\d+);",
-                                                                            match => char.ConvertFromUtf32(Int32.Parse(match.Groups[1].Value)));
+                Translation = Regex.Replace(Translation, @"&#(\d+);",
+                                                            match => char.ConvertFromUtf32(int.Parse(match.Groups[1].Value)));
 
                 Translation = Translation.Replace("<br>", "\n");
 
@@ -161,7 +158,7 @@ namespace I2.Loc
 
                 return Translation;
             }
-            catch (System.Exception ex) 
+            catch (Exception ex) 
             { 
                 Debug.LogError(ex.Message); 
                 return string.Empty;

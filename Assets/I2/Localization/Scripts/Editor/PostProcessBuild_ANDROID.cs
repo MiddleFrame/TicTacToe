@@ -1,33 +1,51 @@
 ﻿#if UNITY_ANDROID
 using UnityEditor.Callbacks;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Android;
 using UnityEngine;
 
 namespace I2.Loc
 {
 	public class PostProcessBuild_Android
+	#if UNITY_2021_1_OR_NEWER
+		:  IPostGenerateGradleAndroidProject
+	#endif
 	{
+		#if UNITY_2021_1_OR_NEWER
+		
+		public int callbackOrder => 0;
+		public void OnPostGenerateGradleAndroidProject(string path)
+		{
+			path = Path.Combine(path, "src/main");
+			PostProcessAndroid(BuildTarget.Android, path);
+		}
+		
+		#else
+
         // Post Process Scene is a hack, because using PostProcessBuild will be called after the APK is generated, and so, I didn't find a way to copy the new files
         [PostProcessScene]
         public static void OnPostProcessScene()
         {
-            #if UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
-                bool isFirstScene = (EditorBuildSettings.scenes.Length>0 && EditorBuildSettings.scenes[0].path == EditorApplication.currentScene);
-            #else
-                bool isFirstScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex <= 0;
-            #endif
+            // #if UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
+            //     bool isFirstScene = (EditorBuildSettings.scenes.Length>0 && EditorBuildSettings.scenes[0].path == EditorApplication.currentScene);
+            // #else
+            //     bool isFirstScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex <= 0;
+            // #endif
+            //
+            // if (!EditorApplication.isPlayingOrWillChangePlaymode &&
+            //     (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android) &&
+            //     isFirstScene)
+            // {
+            //     string projPath = System.IO.Path.GetFullPath(Application.streamingAssetsPath + "/../../Temp/StagingArea");
+            //     //string projPath = System.IO.Path.GetFullPath(Application.dataPath+ "/Plugins/Android");
+            //     PostProcessAndroid(BuildTarget.Android, projPath);
+            // }
+        }		
+        #endif
 
-            if (!EditorApplication.isPlayingOrWillChangePlaymode &&
-                (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android) &&
-                isFirstScene)
-            {
-                string projPath = System.IO.Path.GetFullPath(Application.streamingAssetsPath + "/../../Temp/StagingArea");
-                //string projPath = System.IO.Path.GetFullPath(Application.dataPath+ "/Plugins/Android");
-                PostProcessAndroid(BuildTarget.Android, projPath);
-            }
-        }
 
         //[PostProcessBuild(10000)]
         public static void PostProcessAndroid(BuildTarget buildTarget, string pathToBuiltProject)
@@ -128,6 +146,6 @@ namespace I2.Loc
                 Debug.Log(e);
             }
         }
-    }
+	}
 }
 #endif

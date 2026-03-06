@@ -1,9 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Linq;
-using System.Globalization;
-using System.Collections;
 
 namespace I2.Loc
 {
@@ -26,16 +22,16 @@ namespace I2.Loc
             int tagStart = -1, tagEnd = 0;
 
             // Find all Tags (and Numbers if ignoreNumbers is true)
-            int tagBase = 40000;
+            int tagBase = 0xFFFB;
             tagEnd = 0;
             var tags = new List<string>();
             while (I2Utils.FindNextTag(line, tagEnd, out tagStart, out tagEnd))
             {
-                string tag = "@@" + (char)(tagBase + tags.Count) + "@@";
+                char tag = (char)(tagBase - tags.Count);
                 tags.Add(line.Substring(tagStart, tagEnd - tagStart + 1));
 
                 line = line.Substring(0, tagStart) + tag + line.Substring(tagEnd + 1);
-                tagEnd = tagStart + 5;
+                tagEnd = tagStart + 1;
             }
 
             // Split into lines and fix each line
@@ -45,25 +41,13 @@ namespace I2.Loc
 
 
             // Restore all tags
-  
+
             for (int i = 0; i < tags.Count; i++)
             {
-                var len = line.Length;
-  
-                for (int j = 0; j < len; ++j)
-                {
-                    if (line[j] == '@' && line[j + 1] == '@' && line[j + 2] >= tagBase && line[j + 3] == '@' && line[j + 4] == '@')
-                    {
-                        int idx = line[j + 2] - tagBase;
-                        if (idx % 2 == 0) idx++;
-                        else idx--;
-                        if (idx >= tags.Count) idx = tags.Count - 1;
+                string old_tag = ((char)(tagBase - i)).ToString();
+                string new_tag = I2Utils.ReverseText(tags[i]);
 
-                        line = line.Substring(0, j) + tags[idx] + line.Substring(j + 5);
-
-                        break;
-                    }
-                }
+                line = line.Replace(old_tag, new_tag);
             }
 
             return line;
@@ -71,16 +55,15 @@ namespace I2.Loc
 
        
         public static string FixRTL_IfNeeded(string text, int maxCharacters = 0, bool ignoreNumber=false)
-		{
-			if (IsRight2Left)
+        {
+            if (IsRight2Left)
 				return ApplyRTLfix(text, maxCharacters, ignoreNumber);
-			else
-				return text;
-		}
+            return text;
+        }
 
 		public static bool IsRTL(string Code)
 		{
-			return System.Array.IndexOf(LanguagesRTL, Code)>=0;
+			return Array.IndexOf(LanguagesRTL, Code)>=0;
 		}
     }
 

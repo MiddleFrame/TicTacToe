@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace I2.Loc
 {
@@ -9,7 +10,7 @@ namespace I2.Loc
 		public MonoBehaviour Target;
 		public string MethodName = string.Empty;
 
-		public void Execute( UnityEngine.Object Sender = null )
+		public void Execute( Object Sender = null )
 		{
 			if (HasCallback() && Application.isPlaying)
 				Target.gameObject.SendMessage(MethodName, Sender, SendMessageOptions.DontRequireReceiver);

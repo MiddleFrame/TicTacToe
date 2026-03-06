@@ -1,11 +1,11 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace I2.Loc
 {
-	public enum eSpreadsheetUpdateMode { None, Replace, Merge, AddNewTerms };
+	public enum eSpreadsheetUpdateMode { None, Replace, Merge, AddNewTerms }
 
 	public partial class LanguageSourceData
 	{
@@ -49,9 +49,10 @@ namespace I2.Loc
 
                 #if !UNITY_EDITOR
                     bool Spreadsheet_SpecializationAsRows = true;
+                    bool Spreadsheet_SortRows = true;
                 #endif
 
-                string CSV = Export_I2CSV(category, specializationsAsRows:Spreadsheet_SpecializationAsRows);
+                string CSV = Export_I2CSV(category, specializationsAsRows:Spreadsheet_SpecializationAsRows, sortRows:Spreadsheet_SortRows);
 				Builder.Append(category);
 				Builder.Append("<I2Loc>");
 				Builder.Append(CSV);

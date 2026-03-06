@@ -309,6 +309,7 @@ namespace Cards.CustomType
 
         public Vector2 GetClearPosition()
         {
+            Debug.Log((Vector2)_cardTransformRect.localPosition + " " + _screenScaler.GetVector(_fingerToCardDistance));
             return (Vector2)_cardTransformRect.localPosition - _screenScaler.GetVector(_fingerToCardDistance);
         }
     }

@@ -1,10 +1,5 @@
-﻿using UnityEngine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Linq;
 using UnityEngine.Networking;
 
 namespace I2.Loc
@@ -40,7 +35,7 @@ namespace I2.Loc
             var query = mQueries[lastQuery];
             mQueries.RemoveAt(lastQuery);
 
-            string url = string.Format("{0}?action=Translate&list={1}", LocalizationManager.GetWebServiceURL(), query);
+            string url = $"{LocalizationManager.GetWebServiceURL()}?action=Translate&list={query}";
             www = UnityWebRequest.Get(url);
             I2Utils.SendWebRequest(www);
         }

@@ -1,16 +1,18 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
+
 #pragma warning disable 618
 
 namespace I2.Loc
 {
     #if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoad] 
+    [InitializeOnLoad] 
     #endif
 
     public class LocalizeTarget_UnityStandard_MeshRenderer : LocalizeTarget<MeshRenderer>
     {
         static LocalizeTarget_UnityStandard_MeshRenderer() { AutoRegister(); }
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Type<MeshRenderer, LocalizeTarget_UnityStandard_MeshRenderer>() { Name = "MeshRenderer", Priority = 800 }); }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Type<MeshRenderer, LocalizeTarget_UnityStandard_MeshRenderer> { Name = "MeshRenderer", Priority = 800 }); }
 
         public override eTermType GetPrimaryTermType(Localize cmp) { return eTermType.Mesh; }
         public override eTermType GetSecondaryTermType(Localize cmp) { return eTermType.Material; }
@@ -34,7 +36,7 @@ namespace I2.Loc
                 else
                 {
                     #if UNITY_EDITOR
-                        primaryTerm = UnityEditor.AssetDatabase.GetAssetPath(filter.sharedMesh);
+                        primaryTerm = AssetDatabase.GetAssetPath(filter.sharedMesh);
                         I2Utils.RemoveResourcesPath(ref primaryTerm);
                     #else
                         primaryTerm = filter.sharedMesh.name;
@@ -49,7 +51,7 @@ namespace I2.Loc
             else
             {
                 #if UNITY_EDITOR
-                    secondaryTerm = UnityEditor.AssetDatabase.GetAssetPath(mTarget.sharedMaterial);
+                    secondaryTerm = AssetDatabase.GetAssetPath(mTarget.sharedMaterial);
                     I2Utils.RemoveResourcesPath(ref secondaryTerm);
                 #else
                     secondaryTerm = mTarget.sharedMaterial.name;

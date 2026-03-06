@@ -1,16 +1,17 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace I2.Loc
 {
     #if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoad] 
+    [InitializeOnLoad] 
     #endif
 
     public class LocalizeTarget_UnityUI_RawImage : LocalizeTarget<RawImage>
     {
         static LocalizeTarget_UnityUI_RawImage() { AutoRegister(); }
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Type<RawImage, LocalizeTarget_UnityUI_RawImage>() { Name = "RawImage", Priority = 100 }); }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Type<RawImage, LocalizeTarget_UnityUI_RawImage> { Name = "RawImage", Priority = 100 }); }
 
         public override eTermType GetPrimaryTermType(Localize cmp) { return eTermType.Texture; }
         public override eTermType GetSecondaryTermType(Localize cmp) { return eTermType.Text; }
@@ -39,7 +40,7 @@ namespace I2.Loc
             // In the editor, sometimes unity "forgets" to show the changes
             #if UNITY_EDITOR
             if (!Application.isPlaying)
-                UnityEditor.EditorUtility.SetDirty(mTarget);
+                EditorUtility.SetDirty(mTarget);
             #endif
         }
     }

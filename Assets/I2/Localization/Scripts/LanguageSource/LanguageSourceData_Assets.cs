@@ -1,8 +1,5 @@
-using System;
-using UnityEngine;
 using System.Linq;
-using System.Collections.Generic;
-using Object = UnityEngine.Object;
+using UnityEngine;
 
 namespace I2.Loc
 {
@@ -14,8 +11,8 @@ namespace I2.Loc
         {
             Assets.RemoveAll(x => x == null);
             mAssetDictionary = Assets.Distinct()
-                                     .GroupBy(o => o.name)
-                                     .ToDictionary(g => g.Key, g => g.First());
+                                     .GroupBy(o => o.name, System.StringComparer.Ordinal)
+                                     .ToDictionary(g => g.Key, g => g.First(), System.StringComparer.Ordinal);
         }
 
         public Object FindAsset( string Name )

@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Linq;
-using System.Globalization;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace I2.Loc
 {
@@ -52,7 +52,7 @@ namespace I2.Loc
 			// Find the Source that its on the Resources Folder
 			foreach (string SourceName in GlobalSources)
 			{
-				LanguageSourceAsset sourceAsset = (ResourceManager.pInstance.GetAsset<LanguageSourceAsset>(SourceName));
+				LanguageSourceAsset sourceAsset = ResourceManager.pInstance.GetAsset<LanguageSourceAsset>(SourceName);
 				
 				if (sourceAsset && !Sources.Contains(sourceAsset.mSource))
                 {
@@ -64,13 +64,12 @@ namespace I2.Loc
             }
 		}
 
-		public static System.Func<LanguageSourceData, bool> Callback_AllowSyncFromGoogle = null;
+		public static Func<LanguageSourceData, bool> Callback_AllowSyncFromGoogle = null;
 		static bool AllowSyncFromGoogle(LanguageSourceData Source)
 		{
 			if (Callback_AllowSyncFromGoogle == null)
 				return true;
-			else
-				return Callback_AllowSyncFromGoogle.Invoke(Source);
+			return Callback_AllowSyncFromGoogle.Invoke(Source);
 		}
 
 		internal static void AddSource ( LanguageSourceData Source )
@@ -80,7 +79,7 @@ namespace I2.Loc
 
             Sources.Add( Source );
 
-			if (Source.HasGoogleSpreadsheet() && Source.GoogleUpdateFrequency != LanguageSourceData.eGoogleUpdateFrequency.Never && LocalizationManager.AllowSyncFromGoogle(Source))
+			if (Source.HasGoogleSpreadsheet() && Source.GoogleUpdateFrequency != LanguageSourceData.eGoogleUpdateFrequency.Never && AllowSyncFromGoogle(Source))
 			{
                 #if !UNITY_EDITOR
                     Source.Import_Google_FromCache();
@@ -96,7 +95,7 @@ namespace I2.Loc
 
             //if (force)
             {
-                for (int i = 0; i < Source.mLanguages.Count(); ++i)
+                for (int i = 0; i < Source.mLanguages.Count; ++i)
                     Source.mLanguages[i].SetLoaded(true);
             }
 
@@ -121,7 +120,7 @@ namespace I2.Loc
 
 		public static bool IsGlobalSource( string SourceName )
 		{
-			return System.Array.IndexOf(GlobalSources, SourceName)>=0;
+			return Array.IndexOf(GlobalSources, SourceName)>=0;
 		}
 
 		public static LanguageSourceData GetSourceContaining( string term, bool fallbackToFirst = true )
@@ -135,7 +134,7 @@ namespace I2.Loc
 				}
 			}
 			
-			return ((fallbackToFirst && Sources.Count>0) ? Sources[0] :  null);
+			return fallbackToFirst && Sources.Count>0 ? Sources[0] :  null;
 		}
 
 		public static Object FindAsset (string value)

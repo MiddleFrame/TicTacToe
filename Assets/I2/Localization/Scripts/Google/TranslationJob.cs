@@ -1,10 +1,5 @@
-﻿using UnityEngine;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Linq;
 using UnityEngine.Networking;
 
 namespace I2.Loc
@@ -16,7 +11,7 @@ namespace I2.Loc
     {
         public eJobState mJobState = eJobState.Running;
 
-        public enum eJobState { Running, Succeeded, Failed };
+        public enum eJobState { Running, Succeeded, Failed }
 
         public virtual eJobState GetState() { return mJobState; }
 

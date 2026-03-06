@@ -1,6 +1,8 @@
-﻿using UnityEngine;
-using System.Text;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using UnityEngine;
 
 namespace I2.Loc
 {
@@ -13,10 +15,10 @@ namespace I2.Loc
 			string Text = Encoding.UTF8.GetString (asset.bytes, 0, asset.bytes.Length);
 			Text = Text.Replace("\r\n", "\n");
 			Text = Text.Replace("\r", "\n");
-			System.IO.StringReader reader = new System.IO.StringReader(Text);
+			StringReader reader = new StringReader(Text);
 			
 			string s;
-            Dictionary<string, string> Dict = new Dictionary<string, string>(System.StringComparer.Ordinal);
+            Dictionary<string, string> Dict = new Dictionary<string, string>(StringComparer.Ordinal);
 			while ( (s=reader.ReadLine()) != null )
 			{
 				string Key, Value, Category, TermType, Comment;
@@ -38,7 +40,7 @@ namespace I2.Loc
 			value = string.Empty;
 
 			//--[ Comment ]-----------------------
-			int iComment = line.LastIndexOf("//");
+			int iComment = line.LastIndexOf("//", StringComparison.Ordinal);
 			if (iComment>=0)
 			{
 				comment = line.Substring(iComment+2).Trim();
@@ -47,18 +49,16 @@ namespace I2.Loc
 			}
 
 			//--[ Key ]-----------------------------
-			int iKeyEnd = line.IndexOf("=");
+			int iKeyEnd = line.IndexOf("=", StringComparison.Ordinal);
 			if (iKeyEnd<0)
 			{
 				return false;
 			}
-			else
-			{
-				key = line.Substring(0, iKeyEnd).Trim();
-				value = line.Substring(iKeyEnd+1).Trim();
-				value = value.Replace ("\r\n", "\n").Replace ("\n", "\\n");
-				value = DecodeString(value);
-			}
+
+			key = line.Substring(0, iKeyEnd).Trim();
+			value = line.Substring(iKeyEnd+1).Trim();
+			value = value.Replace ("\r\n", "\n").Replace ("\n", "\\n");
+			value = DecodeString(value);
 
 			//--[ Type ]---------
 			if (key.Length>2 && key[0]=='[')
@@ -90,7 +90,7 @@ namespace I2.Loc
 				{
 					Text = reader.ReadToEnd();
 				}*/
-				using (var reader = new System.IO.StreamReader(Path, encoding ))
+				using (var reader = new StreamReader(Path, encoding ))
 					Text = reader.ReadToEnd();
 			#endif
 
@@ -192,12 +192,12 @@ namespace I2.Loc
 
 		public static List<string[]> ReadI2CSV( string Text )
 		{
-			string[] ColumnSeparator = new string[]{"[*]"};
-			string[] RowSeparator = new string[]{"[ln]"};
+			string[] ColumnSeparator = {"[*]"};
+			string[] RowSeparator = {"[ln]"};
 
 			List<string[]> CSV = new List<string[]>();
-			foreach (var line in Text.Split (RowSeparator, System.StringSplitOptions.None))
-				CSV.Add (line.Split (ColumnSeparator, System.StringSplitOptions.None));
+			foreach (var line in Text.Split (RowSeparator, StringSplitOptions.None))
+				CSV.Add (line.Split (ColumnSeparator, StringSplitOptions.None));
 
 			return CSV;
 		}

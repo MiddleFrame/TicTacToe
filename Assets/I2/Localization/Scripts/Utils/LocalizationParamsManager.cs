@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace I2.Loc
 {
@@ -47,7 +47,7 @@ namespace I2.Loc
                     break;
                 }
             if (!setted)
-                _Params.Add(new ParamValue(){ Name = ParamName, Value = ParamValue });
+                _Params.Add(new ParamValue { Name = ParamName, Value = ParamValue });
         
 			if (localize)
 				OnLocalize();

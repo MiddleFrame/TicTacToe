@@ -1,8 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
-using System.Text;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using UnityEngineInternal;
 
 namespace I2.Loc
 {
@@ -59,7 +62,7 @@ namespace I2.Loc
 
             try
             {
-                var text = System.IO.File.ReadAllText(ScriptFile, Encoding.UTF8);
+                var text = File.ReadAllText(ScriptFile, Encoding.UTF8);
 
                 mSelectedKeys.Clear();
                 foreach (Match match in Regex.Matches(text, "\".+\""))
@@ -72,7 +75,7 @@ namespace I2.Loc
                     }
                 }
             }
-            catch(System.Exception)
+            catch(Exception)
             { }
         }
 
@@ -108,9 +111,9 @@ namespace I2.Loc
 			Debug.Log ("Generating: " + ScriptFile);
 
             var filePath = Application.dataPath + ScriptFile.Substring("Assets".Length);
-            string fileText = sbTrans.ToString() + sbTerms.ToString() + "}";
+            string fileText = sbTrans + sbTerms.ToString() + "}";
 
-            System.IO.File.WriteAllText(filePath, fileText, Encoding.UTF8);
+            File.WriteAllText(filePath, fileText, Encoding.UTF8);
 
 			AssetDatabase.ImportAsset(ScriptFile);
 		}
@@ -125,7 +128,7 @@ namespace I2.Loc
                     string FilePath = AssetDatabase.GUIDToAssetPath(assets[0]);
                     return FilePath;
                 }
-                catch(System.Exception)
+                catch(Exception)
                 { }
             }
             
@@ -196,7 +199,7 @@ namespace I2.Loc
 			for (int i=0; i<Terms.Count; ++i)
 			{
 				sbTrans.AppendLine("			public static string "+AdjustedTerms[i]+ " \t\t{ get{ return LocalizationManager.GetTranslation (\"" + Category+"/"+Terms[i]+"\"); } }");
-                sbTerms.AppendLine("		    public const string " + AdjustedTerms[i] + " = \"" + Category + "/" + Terms[i] + "\";");
+				sbTerms.AppendLine("		    public const string " + AdjustedTerms[i] + " = \"" + Category + "/" + Terms[i] + "\";");
 			}
 		}
 
@@ -214,9 +217,20 @@ namespace I2.Loc
 			// Remove invalid characters
 			char[] chars = Term.ToCharArray();
 			for (int i=0, imax=chars.Length; i<imax; ++i)
-				if (I2Utils.ValidChars.IndexOf(chars[i])<0)
-					chars[i]='_';
-			return new string(chars);
+			{
+				if (!IsValidCharacter(chars[i]))
+					chars[i] = '_';
+			}
+			
+			Term = new string(chars);
+			if (IsCSharpKeyword(Term)) return string.Concat('@', Term);
+			return Term;
+
+			bool IsValidCharacter(char c)
+			{
+				if (I2Utils.ValidChars.IndexOf(c)>=0) return true;
+				return c>='\u4e00' && c<='\u9fff'; // Chinese/Japanese characters
+			}
 		}
 
 		void ScriptTool_EnumerateDuplicatedTerms(List<string> AdjustedTerms)
@@ -226,7 +240,7 @@ namespace I2.Loc
 			for (int i=0, imax=AdjustedTerms.Count; i<imax; ++i)
 			{
 				string currentTerm = AdjustedTerms[i];
-				if (lastTerm == currentTerm || (i<imax-1 && currentTerm==AdjustedTerms[i+1]))
+				if (lastTerm == currentTerm || i<imax-1 && currentTerm==AdjustedTerms[i+1])
 				{
 					AdjustedTerms[i] = AdjustedTerms[i] + "_" + Counter;
 					Counter++;
@@ -239,5 +253,29 @@ namespace I2.Loc
 		}
 
 		#endregion
+
+		bool IsCSharpKeyword(string variableName)
+		{
+			return variableName == "abstract" || variableName == "as" || variableName == "base" || variableName == "bool" || 
+			       variableName == "break" || variableName == "byte" || variableName == "" || variableName == "case" || 
+			       variableName == "catch" || variableName == "char" || variableName == "checked" || variableName == "class" || 
+			       variableName == "const" || variableName == "continue" || variableName == "decimal" || variableName == "default" || 
+			       variableName == "delegate" || variableName == "do" || variableName == "double" || variableName == "else" || 
+			       variableName == "enum" || variableName == "event" || variableName == "explicit" || variableName == "extern" || 
+			       variableName == "false" || variableName == "finally" || variableName == "fixed" || variableName == "float" || 
+			       variableName == "for" || variableName == "foreach" || variableName == "goto" || variableName == "if" || 
+			       variableName == "implicit" || variableName == "in" || variableName == "int" || variableName == "interface" || 
+			       variableName == "internal" || variableName == "is" || variableName == "lock" || variableName == "long" || 
+			       variableName == "namespace" || variableName == "new" || variableName == "null" || variableName == "object" || 
+			       variableName == "operator" || variableName == "out" || variableName == "override" || variableName == "params" || 
+			       variableName == "private" || variableName == "protected" || variableName == "public" || variableName == "readonly" || 
+			       variableName == "ref" || variableName == "return" || variableName == "sbyte" || variableName == "sealed" || 
+			       variableName == "short" || variableName == "sizeof" || variableName == "stackalloc" || variableName == "static" || 
+			       variableName == "string" || variableName == "struct" || variableName == "switch" || variableName == "this" || 
+			       variableName == "throw" || variableName == "true" || variableName == "try" || variableName == "typeof" || 
+			       variableName == "uint" || variableName == "ulong" || variableName == "unchecked" || variableName == "unsafe" || 
+			       variableName == "short" || variableName == "using" || variableName == "virtual" || variableName == "void" || 
+			       variableName == "volatile" || variableName == "while";
+		}
 	}
 }

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cards.CustomType;
 using GameTypeService.Enums;
 using Players.Interfaces;
@@ -91,7 +91,6 @@ namespace Players
 
         public PlayerInfo GetCurrentPlayerOnDevice()
         {
-            Debug.Log($"Current game type {_gameType}");
             PlayerInfo result = (_gameType == GameType.MultiplayerHuman) ? _players[_playerOnlineId - 1] :
                 (_gameType == GameType.SingleHuman) ? GetCurrentPlayer() : _players[0];
 

@@ -21,375 +21,375 @@ MonoBehaviour:
       TermType: 0
       Description: 
       Languages:
-      - "\u041C\u0443\u043B\u044C\u0442\u0438\u043F\u043B\u0435\u0435\u0440"
       - Multiplayer
+      - "\u041C\u0443\u043B\u044C\u0442\u0438\u043F\u043B\u0435\u0435\u0440"
       Flags: 0000
       Languages_Touch: []
     - Term: Game with bot
       TermType: 0
       Description: 
       Languages:
-      - "\u0418\u0433\u0440\u0430 \u0441 \u0431\u043E\u0442\u043E\u043C"
       - Game with bot
+      - "\u0418\u0433\u0440\u0430 \u0441 \u0431\u043E\u0442\u043E\u043C"
       Flags: 0000
       Languages_Touch: []
     - Term: Game with friend
       TermType: 0
       Description: 
       Languages:
-      - "\u0418\u0433\u0440\u0430 \u0441 \u0434\u0440\u0443\u0433\u043E\u043C"
       - Game with friend
+      - "\u0418\u0433\u0440\u0430 \u0441 \u0434\u0440\u0443\u0433\u043E\u043C"
       Flags: 0000
       Languages_Touch: []
     - Term: Friends
       TermType: 0
       Description: 
       Languages:
-      - "\u0414\u0440\u0443\u0437\u044C\u044F"
       - Friends
+      - "\u0414\u0440\u0443\u0437\u044C\u044F"
       Flags: 0000
       Languages_Touch: []
     - Term: Deck
       TermType: 0
       Description: 
       Languages:
-      - "\u041A\u043E\u043B\u043E\u0434\u0430"
       - Deck
+      - "\u041A\u043E\u043B\u043E\u0434\u0430"
       Flags: 0000
       Languages_Touch: []
     - Term: Collection
       TermType: 0
       Description: 
       Languages:
-      - "\u041A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u044F"
       - Collection
+      - "\u041A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u044F"
       Flags: 0000
       Languages_Touch: []
     - Term: Search for the opponent...
       TermType: 0
       Description: 
       Languages:
-      - "\u041F\u043E\u0438\u0441\u043A \u043F\u0440\u043E\u0442\u0438\u0432\u043D\u0438\u043A\u0430..."
       - 'Search for the opponent... '
+      - "\u041F\u043E\u0438\u0441\u043A \u043F\u0440\u043E\u0442\u0438\u0432\u043D\u0438\u043A\u0430..."
       Flags: 0000
       Languages_Touch: []
     - Term: Menu
       TermType: 0
       Description: 
       Languages:
-      - "\u041C\u0435\u043D\u044E"
       - Menu
+      - "\u041C\u0435\u043D\u044E"
       Flags: 0000
       Languages_Touch: []
     - Term: Start game with bot
       TermType: 0
       Description: 
       Languages:
-      - "\u041D\u0430\u0447\u0430\u0442\u044C \u0438\u0433\u0440\u0443 \u0441 \u0431\u043E\u0442\u043E\u043C"
       - Start game with bot
+      - "\u041D\u0430\u0447\u0430\u0442\u044C \u0438\u0433\u0440\u0443 \u0441 \u0431\u043E\u0442\u043E\u043C"
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Random2Mana
       TermType: 0
       Description: 
       Languages:
+      - The next turn will either add or remove 2 mana
       - "\u0421\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0439 \u0445\u043E\u0434
         \u043B\u0438\u0431\u043E \u0434\u043E\u0431\u0430\u0432\u0438\u0442 \u043B\u0438\u0431\u043E
         \u0443\u0434\u0430\u043B\u0438\u0442 2 \u043C\u0430\u043D\u044B"
-      - The next turn will either add or remove 2 mana
       Flags: 0000
       Languages_Touch: []
     - Term: Card/PlaceFigureRandom
       TermType: 0
       Description: 
       Languages:
+      - The next 3 turns at the beginning of the turn places one piece in a random
+        place
       - "\u0421\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0435 3 \u0445\u043E\u0434\u0430
         \u0432 \u043D\u0430\u0447\u0430\u043B\u0435 \u0445\u043E\u0434\u0430 \u0441\u0442\u0430\u0432\u0438\u0442
         \u043E\u0434\u043D\u0443 \u0444\u0438\u0433\u0443\u0440\u0443 \u0432 \u0441\u043B\u0443\u0447\u0430\u043D\u043E\u043C
         \u043C\u0435\u0441\u0442\u0435"
-      - The next 3 turns at the beginning of the turn places one piece in a random
-        place
       Flags: 0000
       Languages_Touch: []
     - Term: Card/PlaceFigureWithCard
       TermType: 0
       Description: 
       Languages:
+      - Places a Piece at the chosen location on the board and you draw one card
       - "\u0421\u0442\u0430\u0432\u0438\u0442 \u0424\u0438\u0433\u0443\u0440\u0443
         \u0432 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u043E\u043C \u043C\u0435\u0441\u0442\u0435
         \u043D\u0430 \u043F\u043E\u043B\u0435 \u0438 \u0432\u044B \u0431\u0435\u0440\u0451\u0442\u0435
         \u043E\u0434\u043D\u0443 \u043A\u0430\u0440\u0442\u0443"
-      - Places a Piece at the chosen location on the board and you draw one card
       Flags: 0000
       Languages_Touch: []
     - Term: Card/PlaceFigure
       TermType: 0
       Description: 
       Languages:
+      - Places a Piece at the chosen location on the field
       - "\u0421\u0442\u0430\u0432\u0438\u0442 \u0424\u0438\u0433\u0443\u0440\u0443
         \u0432 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u043E\u043C \u043C\u0435\u0441\u0442\u0435
         \u043D\u0430 \u043F\u043E\u043B\u0435"
-      - Places a Piece at the chosen location on the field
       Flags: 0000
       Languages_Touch: []
     - Term: Card/PlaceAroundFreeze
       TermType: 0
       Description: 
       Languages:
+      - Near each current ice, another one appears
       - "\u0412\u043E\u0437\u043B\u0435 \u043A\u0430\u0436\u0434\u043E\u0433\u043E
         \u0442\u0435\u043A\u0443\u0449\u0435\u0433\u043E \u043B\u044C\u0434\u0430
         \u043F\u043E\u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F \u0435\u0449\u0451
         \u043E\u0434\u0438\u043D "
-      - Near each current ice, another one appears
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Place5
       TermType: 0
       Description: 
       Languages:
+      - Places 5 pieces in a random place on the field
       - "\u0421\u0442\u0430\u0432\u0438\u0442 5 \u0444\u0438\u0433\u0443\u0440 \u0432
         \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u043E\u043C \u043C\u0435\u0441\u0442\u0435 
         \u043D\u0430 \u043F\u043E\u043B\u0435"
-      - Places 5 pieces in a random place on the field
       Flags: 0000
       Languages_Touch: []
     - Term: Card/ManaPerIce
       TermType: 0
       Description: 
       Languages:
+      - For every 3 ice on the field, you get +1 mana (possibly beyond the maximum)
       - "\u0417\u0430 \u043A\u0430\u0436\u0434\u044B\u0435 3 \u043B\u044C\u0434\u0430
         \u043D\u0430 \u043F\u043E\u043B\u0435 \u0432\u044B \u043F\u043E\u043B\u0443\u0447\u0430\u0435\u0442\u0435
         +1 \u043C\u0430\u043D\u0443 (\u043C\u043E\u0436\u043D\u043E \u0441\u0432\u0435\u0440\u0445
         \u043C\u0430\u043A\u0441\u0438\u043C\u0443\u043C\u0430)"
-      - For every 3 ice on the field, you get +1 mana (possibly beyond the maximum)
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Increase2MaxMana
       TermType: 0
       Description: 
       Languages:
+      - For the next two turns, mana is increased by 2 for both players.
       - "\u0412 \u0442\u0435\u0447\u0435\u043D\u0438\u0438 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0445
         \u0434\u0432\u0443\u0445 \u0445\u043E\u0434\u043E\u0432 \u0434\u043B\u044F
         \u043E\u0431\u043E\u0438\u0445 \u0438\u0433\u0440\u043E\u043A\u043E\u0432
         \u043C\u0430\u043D\u0430 \u0443\u0432\u0435\u043B\u0438\u0447\u0435\u0438\u0432\u0430\u0435\u0442\u0441\u044F
         \u043D\u0430 2"
-      - For the next two turns, mana is increased by 2 for both players.
       Flags: 0000
       Languages_Touch: []
     - Term: Card/FreezeCell
       TermType: 0
       Description: 
       Languages:
+      - Freezes the selected empty cell
       - "\u0417\u0430\u043C\u043E\u0440\u0430\u0436\u0438\u0432\u0430\u0435\u0442
         \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u0443\u044E \u043F\u0443\u0441\u0442\u0443\u044E
         \u043A\u043B\u0435\u0442\u043A\u0443"
-      - Freezes the selected empty cell
       Flags: 0000
       Languages_Touch: []
     - Term: Card/FreezeAllMana
       TermType: 0
       Description: 
       Languages:
+      - Consumes all of your remaining mana and places 2 ice per unit
       - "\u0420\u0430\u0441\u0445\u043E\u0434\u0443\u0435\u0442 \u0432\u0441\u044E
         \u043E\u0441\u0442\u0430\u0432\u0448\u0443\u044E\u0441\u044F \u0432\u0430\u0448\u0443
         \u043C\u0430\u043D\u0443 \u0438 \u0441\u0442\u0430\u0432\u0438\u0442 2 \u043B\u044C\u0434\u0430
         \u0437\u0430 \u043A\u0430\u0436\u0434\u0443\u044E \u0435\u0434\u0438\u043D\u0438\u0446\u0443"
-      - Consumes all of your remaining mana and places 2 ice per unit
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Freeze6Figure
       TermType: 0
       Description: 
       Languages:
+      - Freezes up to 6 of your pieces
       - "\u0417\u0430\u043C\u043E\u0440\u0430\u0436\u0438\u0432\u0430\u0435\u0442
         \u0434\u043E 6 \u0432\u0430\u0448\u0438\u0445 \u0444\u0438\u0433\u0443\u0440 "
-      - Freezes up to 6 of your pieces
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Freeze3Group
       TermType: 0
       Description: 
       Languages:
+      - Freezes 3 random cells
       - "\u0417\u0430\u043C\u043E\u0440\u0430\u0436\u0438\u0432\u0430\u0435\u0442
         3 \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u044Be \u043A\u043B\u0435\u0442\u043A\u0438"
-      - Freezes 3 random cells
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Freeze3CellEffected
       TermType: 0
       Description: 
       Languages:
+      - Ice spawns at the start of the turn for the next 3 turns
       - "\u0421\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0435 3 \u0445\u043E\u0434\u0430
         \u0432 \u043D\u0430\u0447\u0430\u043B\u0435 \u0445\u043E\u0434\u0430 \u043F\u043E\u044F\u0432\u043B\u044F\u0435\u0442\u0441\u044F
         \u043B\u0451\u0434"
-      - Ice spawns at the start of the turn for the next 3 turns
       Flags: 0000
       Languages_Touch: []
     - Term: Card/DestroyFreeze
       TermType: 0
       Description: 
       Languages:
+      - Destroys up to 6 ice and puts as many figurines as were destroyed
       - "\u0423\u043D\u0438\u0447\u0442\u043E\u0436\u0430\u0435\u0442 \u0434\u043E
         6 \u043B\u044C\u0434\u0430 \u0438 \u0441\u0442\u0430\u0432\u0438\u0442 \u0441\u0442\u043E\u043B\u044C\u043A\u043E
         \u0444\u0438\u0433\u0443\u0440 \u0441\u043A\u043E\u043B\u044C\u043A\u043E
         \u0431\u044B\u043B\u043E \u0443\u043D\u0438\u0447\u0442\u043E\u0436\u0435\u043D\u043E"
-      - Destroys up to 6 ice and puts as many figurines as were destroyed
       Flags: 0000
       Languages_Touch: []
     - Term: Card/DecreaseIncrease2Mana
       TermType: 0
       Description: 
       Languages:
+      - The next turn will remove 2 mana, and the next turn will add 2 mana.
       - "\u0421\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0439 \u0445\u043E\u0434
         \u0443\u0434\u0430\u043B\u0438\u0442 \u0434\u0432\u0435 \u043C\u0430\u043D\u044B,
         \u0430 \u0447\u0435\u0440\u0435\u0445 \u043E\u0434\u0438\u043D - \u0434\u043E\u0431\u0430\u0432\u0438\u0442
         2 \u043C\u0430\u043D\u044B"
-      - The next turn will remove 2 mana, and the next turn will add 2 mana.
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Decrease2MaxMana
       TermType: 0
       Description: 
       Languages:
+      - For the next two turns, both players' mana is reduced by 2.
       - "\u0412 \u0442\u0435\u0447\u0435\u043D\u0438\u0438 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0445
         \u0434\u0432\u0443\u0445 \u0445\u043E\u0434\u043E\u0432 \u0434\u043B\u044F
         \u043E\u0431\u043E\u0438\u0445 \u0438\u0433\u0440\u043E\u043A\u043E\u0432
         \u043C\u0430\u043D\u0430 \u0443\u043C\u0435\u043D\u044C\u0448\u0430\u0435\u0442\u0441\u044F
         \u043D\u0430 2"
-      - For the next two turns, both players' mana is reduced by 2.
       Flags: 0000
       Languages_Touch: []
     - Term: Card/BonusMana
       TermType: 0
       Description: 
       Languages:
+      - You gain +1 Mana at the start of your next turn.
       - "\u0412\u044B \u043F\u043E\u043B\u0443\u0447\u0430\u0435\u0442 +1 \u043C\u0430\u043D\u044B
         \u0432 \u043D\u0430\u0447\u0430\u043B\u0435 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u0433\u043E
         \u0445\u043E\u0434\u0430"
-      - You gain +1 Mana at the start of your next turn.
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Restore1Mana
       TermType: 0
       Description: 
       Languages:
+      - Restores 1 mana
       - "\u0412\u043E\u0441\u0441\u0442\u0430\u043D\u0430\u0432\u043B\u0438\u0432\u0430\u0435\u0442
         1 \u043C\u0430\u043D\u044B"
-      - Restores 1 mana
       Flags: 0000
       Languages_Touch: []
     - Term: Card/RestoreAllMana
       TermType: 0
       Description: 
       Languages:
+      - Restores all mana
       - "\u0412\u043E\u0441\u0441\u0442\u0430\u043D\u0430\u0432\u043B\u0438\u0432\u0430\u0435\u0442
         \u0432\u0441\u044E \u043C\u0430\u043D\u0443"
-      - Restores all mana
       Flags: 0000
       Languages_Touch: []
     - Term: Tip/Freeze
       TermType: 0
       Description: 
       Languages:
+      - 'Freeze: a piece cannot be removed from the field 2 turns'
       - "\u0417\u0430\u043C\u043E\u0440\u043E\u0437\u043A\u0430: \u0444\u0438\u0433\u0443\u0440\u0443
         \u043D\u0435\u043B\u044C\u0437\u044F \u0443\u0431\u0440\u0430\u0442\u044C
         \u0441 \u043F\u043E\u043B\u044F 2 \u0445\u043E\u0434\u0430"
-      - 'Freeze: a piece cannot be removed from the field 2 turns'
       Flags: 0000
       Languages_Touch: []
     - Term: 'You get:'
       TermType: 0
       Description: 
       Languages:
-      - "\u0412\u044B \u043F\u043E\u043B\u0443\u0447\u0430\u0435\u0442\u0435:"
       - 'You get:'
+      - "\u0412\u044B \u043F\u043E\u043B\u0443\u0447\u0430\u0435\u0442\u0435:"
       Flags: 0000
       Languages_Touch: []
     - Term: End turn
       TermType: 0
       Description: 
       Languages:
-      - "\u041A\u043E\u043D\u0435\u0446 \u0445\u043E\u0434\u0430"
       - End turn
+      - "\u041A\u043E\u043D\u0435\u0446 \u0445\u043E\u0434\u0430"
       Flags: 0000
       Languages_Touch: []
     - Term: Continue
       TermType: 0
       Description: 
       Languages:
-      - "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C"
       - Continue
+      - "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C"
       Flags: 0000
       Languages_Touch: []
     - Term: Buy new card (
       TermType: 0
       Description: 
       Languages:
+      - Buy new card (
       - "\u041A\u0443\u043F\u0438\u0442\u044C \u043D\u043E\u0432\u0443\u044E \u043A\u0430\u0440\u0442\u0443
         ("
-      - Buy new card (
       Flags: 0000
       Languages_Touch: []
     - Term: Not Available
       TermType: 0
       Description: 
       Languages:
-      - "\u041D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D"
       - Not Available
+      - "\u041D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D"
       Flags: 0000
       Languages_Touch: []
     - Term: YouWin
       TermType: 0
       Description: 
       Languages:
-      - "\u0412\u042B\n\u041F\u041E\u0411\u0415\u0414\u0418\u041B\u0418!"
       - 'YOU
 
         WIN!'
+      - "\u0412\u042B\n\u041F\u041E\u0411\u0415\u0414\u0418\u041B\u0418!"
       Flags: 0000
       Languages_Touch: []
     - Term: YouLose
       TermType: 0
       Description: 
       Languages:
-      - "\u0412\u042B\n\u041F\u0420\u041E\u0418\u0413\u0420\u0410\u041B\u0418!"
       - 'YOU
 
         LOSE!'
+      - "\u0412\u042B\n\u041F\u0420\u041E\u0418\u0413\u0420\u0410\u041B\u0418!"
       Flags: 0000
       Languages_Touch: []
     - Term: Draw
       TermType: 0
       Description: 
       Languages:
-      - "\u041D\u0438\u0447\u044C\u044F!"
       - Draw!
+      - "\u041D\u0438\u0447\u044C\u044F!"
       Flags: 0000
       Languages_Touch: []
     - Term: Store
       TermType: 0
       Description: 
       Languages:
-      - "\u041C\u0430\u0433\u0430\u0437\u0438\u043D"
       - Store
+      - "\u041C\u0430\u0433\u0430\u0437\u0438\u043D"
       Flags: 0000
       Languages_Touch: []
     - Term: Unlock all card
       TermType: 0
       Description: 
       Languages:
+      - Unlock all card
       - "\u0420\u0430\u0437\u0431\u043B\u043E\u043A\u0438\u0440\u043E\u0432\u0430\u0442\u044C
         \u0432\u0441\u0435 \u043A\u0430\u0440\u0442\u044B"
-      - Unlock all card
       Flags: 0000
       Languages_Touch: []
     - Term: Unlock 5 card
       TermType: 0
       Description: 
       Languages:
+      - Unlock 5 card
       - "\u0420\u0430\u0437\u0431\u043B\u043E\u043A\u0438\u0440\u043E\u0432\u0430\u0442\u044C
         5 \u043A\u0430\u0440\u0442"
-      - Unlock 5 card
       Flags: 0000
       Languages_Touch: []
     - Term: This part of the game is currently still in development and is actively
@@ -398,6 +398,9 @@ MonoBehaviour:
       TermType: 0
       Description: 
       Languages:
+      - "This part of the game is currently still in development and is actively
+        changing. By doing things here, you will help us a lot in improving the game
+        in the future. \nThanks!"
       - "\u042D\u0442\u0430 \u0447\u0430\u0441\u0442\u044C \u0438\u0433\u0440\u044B
         \u043D\u0430 \u0434\u0430\u043D\u043D\u044B\u0439 \u043C\u043E\u043C\u0435\u043D\u0442
         \u0432\u0441\u0435 \u0435\u0449\u0435 \u043D\u0430\u0445\u043E\u0434\u0438\u0442\u0441\u044F
@@ -407,34 +410,31 @@ MonoBehaviour:
         \u0432\u044B \u043E\u0447\u0435\u043D\u044C \u043F\u043E\u043C\u043E\u0436\u0435\u0442\u0435
         \u043D\u0430\u043C \u0432 \u0443\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0438
         \u0438\u0433\u0440\u044B \u0432 \u0431\u0443\u0434\u0443\u0449\u0435\u043C.\n\u0421\u043F\u0430\u0441\u0438\u0431\u043E!"
-      - "This part of the game is currently still in development and is actively
-        changing. By doing things here, you will help us a lot in improving the game
-        in the future. \nThanks!"
       Flags: 0000
       Languages_Touch: []
     - Term: Warning!
       TermType: 0
       Description: 
       Languages:
-      - "\u041F\u0440\u0435\u0434\u0443\u043F\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435!"
       - Warning!
+      - "\u041F\u0440\u0435\u0434\u0443\u043F\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435!"
       Flags: 0000
       Languages_Touch: []
     - Term: Cool!
       TermType: 0
       Description: 
       Languages:
-      - "\u041A\u0440\u0443\u0442\u043E!"
       - Cool!
+      - "\u041A\u0440\u0443\u0442\u043E!"
       Flags: 0000
       Languages_Touch: []
     - Term: Welcome to Tik-Tac-Toe plus!
       TermType: 0
       Description: 
       Languages:
+      - Welcome to Tik-Tac-Toe plus!
       - "\u0414\u043E\u0431\u0440\u043E \u043F\u043E\u0436\u0430\u043B\u043E\u0432\u0430\u0442\u044C
         \u0432 Tik-Tac-Toe Plus!"
-      - Welcome to Tik-Tac-Toe plus!
       Flags: 0000
       Languages_Touch: []
     - Term: This short tutorial will help you get familiar with the basic mechanics
@@ -442,12 +442,12 @@ MonoBehaviour:
       TermType: 0
       Description: 
       Languages:
+      - This short tutorial will help you get familiar with the basic mechanics of
+        the game.
       - "\u042D\u0442\u043E\u0442 \u043A\u0440\u0430\u0442\u043A\u0438\u0439 \u0442\u0443\u0442\u043E\u0440\u0438\u0430\u043B
         \u043F\u043E\u043C\u043E\u0436\u0435\u0442 \u0432\u0430\u043C \u043E\u0437\u043D\u0430\u043A\u043E\u043C\u0438\u0442\u044C\u0441\u044F
         \u0441 \u043E\u0441\u043D\u043E\u0432\u043D\u044B\u043C\u0438 \u043C\u0435\u0445\u0430\u043D\u0438\u043A\u0430\u043C\u0438
         \u0438\u0433\u0440\u044B."
-      - This short tutorial will help you get familiar with the basic mechanics of
-        the game.
       Flags: 0000
       Languages_Touch: []
     - Term: This is mana. It is spent on the drawing of each card. If you use the
@@ -455,14 +455,14 @@ MonoBehaviour:
       TermType: 0
       Description: 
       Languages:
+      - This is mana. It is spent on the drawing of each card. If you use the same
+        card once per turn, its cost will increase.
       - "\u042D\u0442\u043E \u043C\u0430\u043D\u0430. \u041E\u043D \u0442\u0440\u0430\u0442\u0438\u0442\u0441\u044F
         \u043D\u0430 \u0440\u043E\u0437\u044B\u0433\u0440\u044B\u0448 \u043A\u0430\u0436\u0434\u043E\u0439
         \u043A\u0430\u0440\u0442\u044B. \u0415\u0441\u043B\u0438 \u0432\u044B \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u0442\u0435
         \u043E\u0434\u043D\u0443 \u0438 \u0442\u0443 \u0436\u0435 \u043A\u0430\u0440\u0442\u0443
         \u043E\u0434\u0438\u043D \u0440\u0430\u0437 \u0437\u0430 \u0445\u043E\u0434,
         \u0435\u0435 \u0441\u0442\u043E\u0438\u043C\u043E\u0441\u0442\u044C \u0443\u0432\u0435\u043B\u0438\u0447\u0438\u0442\u0441\u044F."
-      - This is mana. It is spent on the drawing of each card. If you use the same
-        card once per turn, its cost will increase.
       Flags: 0000
       Languages_Touch: []
     - Term: This is a score. The match is divided into rounds. In each round, you
@@ -470,21 +470,21 @@ MonoBehaviour:
       TermType: 0
       Description: 
       Languages:
+      - This is a score. The match is divided into rounds. In each round, you need
+        to score 20 points.
       - "\u042D\u0442\u043E \u043E\u0447\u043A\u0438. \u041C\u0430\u0442\u0447 \u0440\u0430\u0437\u0431\u0438\u0442
         \u043D\u0430 \u0440\u0430\u0443\u043D\u0434\u044B. \u0412 \u043A\u0430\u0436\u0434\u043E\u043C
         \u0440\u0430\u0443\u043D\u0434\u0435 \u043D\u0443\u0436\u043D\u043E \u043D\u0430\u0431\u0440\u0430\u0442\u044C
         20 \u043E\u0447\u043A\u043E\u0432."
-      - This is a score. The match is divided into rounds. In each round, you need
-        to score 20 points.
       Flags: 0000
       Languages_Touch: []
     - Term: Each turn, you take 5 cards into your hand.
       TermType: 0
       Description: 
       Languages:
+      - Each turn, you take 5 cards into your hand.
       - "\u041A\u0430\u0436\u0434\u044B\u0439 \u0445\u043E\u0434 \u0432\u044B \u0431\u0435\u0440\u0435\u0442\u0435
         \u0432 \u0440\u0443\u043A\u0443 5 \u043A\u0430\u0440\u0442."
-      - Each turn, you take 5 cards into your hand.
       Flags: 0000
       Languages_Touch: []
     - Term: Once per turn, you may replace a random card from your hand with a card
@@ -492,16 +492,16 @@ MonoBehaviour:
       TermType: 0
       Description: 
       Languages:
+      - 'Once per turn, you may replace a random card from your hand with a card
+        from your deck.
+
+'
       - "\u041E\u0434\u0438\u043D \u0440\u0430\u0437 \u0437\u0430 \u0445\u043E\u0434
         \u0432\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0437\u0430\u043C\u0435\u043D\u0438\u0442\u044C
         \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u0443\u044E \u043A\u0430\u0440\u0442\u0443
         \u0438\u0437 \u0432\u0430\u0448\u0435\u0439 \u0440\u0443\u043A\u0438 \u043D\u0430
         \u043A\u0430\u0440\u0442\u0443 \u0438\u0437 \u0432\u0430\u0448\u0435\u0439
         \u043A\u043E\u043B\u043E\u0434\u044B.\n"
-      - 'Once per turn, you may replace a random card from your hand with a card
-        from your deck.
-
-'
       Flags: 0000
       Languages_Touch: []
     - Term: If the field is full, the round ends with the victory awarded to the
@@ -509,13 +509,13 @@ MonoBehaviour:
       TermType: 0
       Description: 
       Languages:
+      - If the field is full, the round ends with the victory awarded to the player
+        with the most points.
       - "\u0415\u0441\u043B\u0438 \u043F\u043E\u043B\u0435 \u0437\u0430\u043F\u043E\u043B\u043D\u0435\u043D\u043E,
         \u0440\u0430\u0443\u043D\u0434 \u0437\u0430\u043A\u0430\u043D\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F
         \u043F\u043E\u0431\u0435\u0434\u043E\u0439 \u0438\u0433\u0440\u043E\u043A\u0430,
         \u043D\u0430\u0431\u0440\u0430\u0432\u0448\u0435\u0433\u043E \u043D\u0430\u0438\u0431\u043E\u043B\u044C\u0448\u0435\u0435
         \u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u043E\u0447\u043A\u043E\u0432."
-      - If the field is full, the round ends with the victory awarded to the player
-        with the most points.
       Flags: 0000
       Languages_Touch: []
     - Term: With each new round, the field and mana increases. The player which won
@@ -523,164 +523,172 @@ MonoBehaviour:
       TermType: 0
       Description: 
       Languages:
+      - With each new round, the field and mana increases. The player which won most
+        rounds wins the match.
       - "\u0421 \u043A\u0430\u0436\u0434\u044B\u043C \u043D\u043E\u0432\u044B\u043C
         \u0440\u0430\u0443\u043D\u0434\u043E\u043C \u0443\u0432\u0435\u043B\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044F
         \u043F\u043E\u043B\u0435 \u0438 \u043C\u0430\u043D\u0430. \u0418\u0433\u0440\u043E\u043A,
         \u0432\u044B\u0438\u0433\u0440\u0430\u0432\u0448\u0438\u0439 \u0431\u043E\u043B\u044C\u0448\u0435
         \u0432\u0441\u0435\u0433\u043E \u0440\u0430\u0443\u043D\u0434\u043E\u0432,
         \u043F\u043E\u0431\u0435\u0436\u0434\u0430\u0435\u0442 \u0432 \u043C\u0430\u0442\u0447\u0435."
-      - With each new round, the field and mana increases. The player which won most
-        rounds wins the match.
       Flags: 0000
       Languages_Touch: []
     - Term: Tutorial
       TermType: 0
       Description: 
       Languages:
-      - "\u0420\u0443\u043A\u043E\u0432\u043E\u0434\u0441\u0442\u0432\u043E"
       - Tutorial
+      - "\u0420\u0443\u043A\u043E\u0432\u043E\u0434\u0441\u0442\u0432\u043E"
       Flags: 0000
       Languages_Touch: []
     - Term: Replay
       TermType: 0
       Description: 
       Languages:
-      - "\u0417\u0430\u043D\u043E\u0432\u043E"
       - Replay
+      - "\u0417\u0430\u043D\u043E\u0432\u043E"
       Flags: 0000
       Languages_Touch: []
     - Term: Cards/SurroundedByIce
       TermType: 0
       Description: 
       Languages:
+      - Destroys up ice around your piece
       - "\u0423\u043D\u0438\u0447\u0442\u043E\u0436\u0430\u0435\u0442 \u043B\u0435\u0434
         \u0432\u043E\u043A\u0440\u0443\u0433 \u0432\u0430\u0448\u0435\u0439 \u0444\u0438\u0433\u0443\u0440\u044B"
-      - Destroys up ice around your piece
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Restore3Mana
       TermType: 0
       Description: 
       Languages:
+      - Restore 3 mana
       - "\u0412\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0438\u0432\u0430\u0435\u0442
         3 \u043C\u0430\u043D\u044B"
-      - Restore 3 mana
       Flags: 0000
       Languages_Touch: []
     - Term: Card/PlaceMore
       TermType: 0
       Description: 
       Languages:
+      - Consumes all of your remaining mana and places piece per unit
       - "\u041F\u043E\u0433\u043B\u043E\u0449\u0430\u0435\u0442 \u0432\u0441\u044E
         \u0432\u0430\u0448\u0443 \u043E\u0441\u0442\u0430\u0432\u0448\u0443\u044E\u0441\u044F
         \u043C\u0430\u043D\u0443 \u0438 \u0440\u0430\u0437\u043C\u0435\u0449\u0430\u0435\u0442
         \u043F\u043E \u043E\u0434\u043D\u043E\u0439 \u0448\u0442\u0443\u043A\u0435
         \u043D\u0430 \u0435\u0434\u0438\u043D\u0438\u0446\u0443"
-      - Consumes all of your remaining mana and places piece per unit
       Flags: 0000
       Languages_Touch: []
     - Term: Card/Shortage
       TermType: 0
       Description: 
       Languages:
-      - "\u0412\u044B \u0431\u0435\u0440\u0435\u0442\u0435 \u0434\u0432\u0435 \u043A\u0430\u0440\u0442\u044B"
       - You draw two card
+      - "\u0412\u044B \u0431\u0435\u0440\u0435\u0442\u0435 \u0434\u0432\u0435 \u043A\u0430\u0440\u0442\u044B"
       Flags: 0000
       Languages_Touch: []
     - Term: Card/FullHouse
       TermType: 0
       Description: 
       Languages:
+      - You fill your hand with cards from the deck
       - "\u0412\u044B \u043D\u0430\u043F\u043E\u043B\u043D\u044F\u0435\u0442\u0435
         \u0440\u0443\u043A\u0443 \u043A\u0430\u0440\u0442\u0430\u043C\u0438 \u0438\u0437
         \u043A\u043E\u043B\u043E\u0434\u044B"
-      - You fill your hand with cards from the deck
       Flags: 0000
       Languages_Touch: []
     - Term: Card/IceEncirclement
       TermType: 0
       Description: 
       Languages:
+      - Freezes empty cells in the neighborhood of your piece
       - "\u0417\u0430\u043C\u043E\u0440\u0430\u0436\u0438\u0432\u0430\u0435\u0442
         \u043F\u0443\u0441\u0442\u044B\u0435 \u043A\u043B\u0435\u0442\u043A\u0438
         \u043F\u043E \u0441\u043E\u0441\u0435\u0434\u0441\u0442\u0432\u0443 \u0441
         \u0432\u0430\u0448\u0435\u0439 \u0444\u0438\u0433\u0443\u0440\u043E\u0439"
-      - Freezes empty cells in the neighborhood of your piece
       Flags: 0000
       Languages_Touch: []
     - Term: Settings
       TermType: 0
       Description: 
       Languages:
-      - "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
       - Settings
+      - "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
       Flags: 0000
       Languages_Touch: []
     - Term: Username
       TermType: 0
       Description: 
       Languages:
-      - "\u041D\u0438\u043A\u043D\u0435\u0439\u043C"
       - Username
+      - "\u041D\u0438\u043A\u043D\u0435\u0439\u043C"
       Flags: 0000
       Languages_Touch: []
     - Term: Language
       TermType: 0
       Description: 
       Languages:
-      - "\u042F\u0437\u044B\u043A"
       - Language
+      - "\u042F\u0437\u044B\u043A"
       Flags: 0000
       Languages_Touch: []
     - Term: Sounds
       TermType: 0
       Description: 
       Languages:
-      - "\u0417\u0432\u0443\u043A\u0438"
       - Sounds
+      - "\u0417\u0432\u0443\u043A\u0438"
       Flags: 0000
       Languages_Touch: []
     - Term: Privacy
       TermType: 0
       Description: 
       Languages:
-      - "\u041A\u043E\u043D\u0444\u0438\u0434\u0435\u043D\u0446\u0438\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C"
       - Privacy
+      - "\u041A\u043E\u043D\u0444\u0438\u0434\u0435\u043D\u0446\u0438\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C"
       Flags: 0000
       Languages_Touch: []
     - Term: Discord
       TermType: 0
       Description: 
       Languages:
-      - "\u0414\u0438\u0441\u043A\u043E\u0440\u0434"
       - Discord
+      - "\u0414\u0438\u0441\u043A\u043E\u0440\u0434"
       Flags: 0000
       Languages_Touch: []
     - Term: Buy new card
       TermType: 0
       Description: 
       Languages:
-      - "\u041A\u0443\u043F\u0438\u0442\u044C \u043D\u043E\u0432\u0443\u044E \u043A\u0430\u0440\u0442\u0443"
       - Buy new card
+      - "\u041A\u0443\u043F\u0438\u0442\u044C \u043D\u043E\u0432\u0443\u044E \u043A\u0430\u0440\u0442\u0443"
       Flags: 0000
       Languages_Touch: []
     - Term: Campaign
       TermType: 0
       Description: 
       Languages:
-      - "\u041A\u0430\u043C\u043F\u0430\u043D\u0438\u044F"
       - Campaign
+      - "\u041A\u0430\u043C\u043F\u0430\u043D\u0438\u044F"
+      Flags: 0000
+      Languages_Touch: []
+    - Term: LiberationSans SDF
+      TermType: 9
+      Description: 
+      Languages:
+      - Roboto-Medium SDF
+      - Roboto-Medium SDF
       Flags: 0000
       Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 1
     mTerm_AppName: 
     mLanguages:
-    - Name: Russian
-      Code: ru
-      Flags: 0
     - Name: English
       Code: en
+      Flags: 0
+    - Name: Russian
+      Code: ru
       Flags: 0
     IgnoreDeviceLanguage: 0
     _AllowUnloadingLanguages: 0
@@ -693,8 +701,10 @@ MonoBehaviour:
     GoogleInEditorCheckFrequency: 2
     GoogleUpdateSynchronization: 1
     GoogleUpdateDelay: 0
-    Assets: []
+    Assets:
+    - {fileID: 11400000, guid: 21562d6efbefd994c8df933592768d10, type: 2}
     Spreadsheet_LocalFileName: 
     Spreadsheet_LocalCSVSeparator: ','
     Spreadsheet_LocalCSVEncoding: utf-8
     Spreadsheet_SpecializationAsRows: 1
+    Spreadsheet_SortRows: 1

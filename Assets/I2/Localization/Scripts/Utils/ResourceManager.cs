@@ -171,10 +171,11 @@ namespace I2.Loc
 			return null;
 		}
 
-		public void CleanResourceCache()
+		public void CleanResourceCache( bool unloadResources=false )
 		{
 			mResourcesCache.Clear();
-			Resources.UnloadUnusedAssets();
+			if (unloadResources)
+				Resources.UnloadUnusedAssets();
 
 			CancelInvoke();
 			//mCleaningScheduled = false;

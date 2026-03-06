@@ -145,11 +145,11 @@ namespace Cards.CustomType
                 _cardView.HideTip(true);
             }
 
-            if (_lastAlphaState == _fieldService.IsInFieldHeight(vectorFigure.y))
+           /* if (_lastAlphaState == _fieldService.IsInFieldHeight(vectorFigure.y))
             {
                 _lastAlphaState = !_lastAlphaState;
                 SetGroupAlpha(_lastAlphaState ? 1 : 0, false);
-            }
+            }*/
 
             _chosenCell = _fieldService.GetIdFromPosition(vectorFigure, false);
             if (_prevChosenCell != _chosenCell)
@@ -287,7 +287,7 @@ namespace Cards.CustomType
 
         public Vector2 GetClearPosition()
         {
-            return _cardView.GetClearPosition();
+            return _cardView.GetPositionWithDistance(Input.mousePosition);
         }
     }
 }

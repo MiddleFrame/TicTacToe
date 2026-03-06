@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace I2.Loc
 {
@@ -8,13 +9,13 @@ namespace I2.Loc
     }
 
     #if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoad] 
+    [InitializeOnLoad] 
     #endif
 
     public class LocalizeTarget_UnityStandard_Child : LocalizeTarget<GameObject>
     {
         static LocalizeTarget_UnityStandard_Child() { AutoRegister(); }
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Child() { Name = "Child", Priority = 200 }); }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Child { Name = "Child", Priority = 200 }); }
 
         public override bool IsValid(Localize cmp) { return cmp.transform.childCount>1; }
         public override eTermType GetPrimaryTermType(Localize cmp) { return eTermType.GameObject; }

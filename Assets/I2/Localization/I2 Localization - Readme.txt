@@ -1,6 +1,21 @@
-﻿----------------------------------------------
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ This asset was shared by https://unityassetcollection.com
+
+ Contact us:
+ - Email: unityassetcollection@gmail.com
+ - Telegram: @assetcollection or https://t.me/assetcollection
+								
+ If you find this package helpful and want to support us. 	
+ Please go to https://tinyurl.com/d0nat10n			
+ We really appreciate your help.				
+ Thank you.	
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
+----------------------------------------------
               I2 Localization
-                  2.8.14 f1
+                   2.8.22 f4
         http://www.inter-illusion.com
           inter.illusion@gmail.com
 ----------------------------------------------
@@ -27,7 +42,7 @@ drop by the I2 forum: http://www.inter-illusion.com/forum/index
 5- Create the languages you will support.
 6- The I2Languages source is a global source accessible by all scenes
 
-The documentation provides further explanaition on each of those steps and some tutorials.
+The documentation provides further explanation on each of those steps and some tutorials.
 Also its presented how to convert an existing NGUI localization into the I2 Localization system.
 
 
@@ -36,7 +51,7 @@ PLAYMAKER
 -----------------------
 
 If you use PlayMaker, please, install:
-   - Assets\I2\Localization\I2Localization_PlayMaker.unitypackage 
+   - http://www.inter-illusion.com/Downloads/I2Localization_PlayMaker.unitypackage
    - PlayMaker Unity UI Addon  (from the Playmaker website - only needed for the example scenes that use Unity UI)
 
 That will install custom actions to access and modify the localization.
@@ -66,6 +81,49 @@ AssetStore Deals   - A bot that constantly checks the Store to find you the late
 -----------------------
  Version History
 -----------------------
+2.8.22
+NEW: Added support for Unity 2022.3.X
+NEW: Specializations can now also use the New Input System to detect if touch is supported
+FIX: Improved performance when importing Spreadsheets on startup
+FIX: Android App Name was not correctly exported when in Unity 2021.2 or newer 
+FIX: Fixed all Tests and corrected several misbehaviour that were exposed in them
+FIX: RTL was failing to align correctly when language started as RTL instead of just switching to it.
+FIX: Crash when Verifying the Google Service if the Spreadsheet was not found
+
+
+
+2.8.21
+NEW: Added "Untranslated" filter to the Term's list popup (thanks to @Hosnkobf)
+NEW: Option "Sort Rows" when exporting to CSV or Google Spreadsheet
+FIX: Fixed exception when saving languages without a name
+FIX: Compile errors when there was a class named Action in the project
+
+2.8.20
+NEW: Missing translations are now shown in the console log.
+FIX: Null Exception when running in 2021.3
+
+2.8.19
+NEW: Baking terms now supports the use of Chinese/Japanese characters
+FIX: Calling Import_Google with force=true, was not using the force parameter and skipping importing the data
+FIX: Url to download the Playmaker actions was not right.
+
+2.8.18
+NEW: Translations fallbacks now working with multiple language sources 
+
+2.8.17
+NEW: When generating ScriptLocalization.cs, if a term name is a C# keyword the variable now is set to start with @
+NEW: There is now LocalizationManager.CustomApplyLocalizationParams to process ALL translations before ApplyLocalizationParams runs
+FIX: Translations with RTL tags were failing (thanks @d xy for looking into this)
+
+2.8.16
+FIX: TextMesh Pro was not correctly displaying multi-line arabic texts
+ 
+2.8.15
+NEW: Performance improvement when switching levels by not calling Resources.UnloadUnusedAssets() unless the user requests it. 
+     For most common scenarios, there is no need to unloadUnusedAssets
+NEW: Lots of stability fixes by cleaning up all warnings detected by the Roslyn Analyzers
+NEW: Fixed several issues/obsolete calls when on the latest versions of Unity       
+
 2.8.14
 NEW: Added support for localizing Video Player
 NEW: Allow skipping Google Synchronization from script by creating a RegisterCallback_AllowSyncFromGoogle class 

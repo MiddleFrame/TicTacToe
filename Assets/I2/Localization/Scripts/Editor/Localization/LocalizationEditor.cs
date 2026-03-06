@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEditor;
-using System.Collections.Generic;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace I2.Loc
 {
@@ -9,10 +11,10 @@ namespace I2.Loc
 
 		#region Variables
 
-		public enum eViewMode { ImportExport, Keys, Languages, Tools, References };
+		public enum eViewMode { ImportExport, Keys, Languages, Tools, References }
 		public static eViewMode mCurrentViewMode = eViewMode.Keys;
 		
-		public enum eSpreadsheetMode { Local, Google };
+		public enum eSpreadsheetMode { Local, Google }
 		public eSpreadsheetMode mSpreadsheetMode = eSpreadsheetMode.Google;
 
 
@@ -27,7 +29,7 @@ namespace I2.Loc
                                         Button_Term_Translate, Button_Term_TranslateAll, Button_Languages_TranslateAll,
                                         Button_Assets_Add, Button_Assets_Replace, Button_Assets_Delete,
                                         Button_GoogleSpreadsheet_RefreshList, Button_GoogleSpreadsheet_Export, Button_GoogleSpreadsheet_Import
-        };
+        }
         public static eTest_ActionType mTestAction = eTest_ActionType.None;
         public static object mTestActionArg, mTestActionArg2;
 
@@ -86,7 +88,7 @@ namespace I2.Loc
 		void OnGUI_ImportExport()
 		{
 			eSpreadsheetMode OldMode = mSpreadsheetMode;
-			mSpreadsheetMode = (eSpreadsheetMode)GUITools.DrawShadowedTabs ((int)mSpreadsheetMode, new string[]{"Local", "Google"});
+			mSpreadsheetMode = (eSpreadsheetMode)GUITools.DrawShadowedTabs ((int)mSpreadsheetMode, new[]{"Local", "Google"});
 			if (mSpreadsheetMode != OldMode)
 				ClearErrors();
 
@@ -105,10 +107,10 @@ namespace I2.Loc
 
             bool canTest = Event.current.type == EventType.Repaint;
 
-            var testAddObj = (canTest && LocalizationEditor.mTestAction == LocalizationEditor.eTest_ActionType.Button_Assets_Add) ? (Object)LocalizationEditor.mTestActionArg : null;
-            var testReplaceIndx = (canTest && LocalizationEditor.mTestAction == LocalizationEditor.eTest_ActionType.Button_Assets_Replace) ? (int)LocalizationEditor.mTestActionArg : -1;
-            var testReplaceObj = (canTest && LocalizationEditor.mTestAction == LocalizationEditor.eTest_ActionType.Button_Assets_Replace) ? (Object)LocalizationEditor.mTestActionArg2 : null;
-            var testDeleteIndx = (canTest && LocalizationEditor.mTestAction == LocalizationEditor.eTest_ActionType.Button_Assets_Delete) ? (int)LocalizationEditor.mTestActionArg : -1;
+            var testAddObj = canTest && mTestAction == eTest_ActionType.Button_Assets_Add ? (Object)mTestActionArg : null;
+            var testReplaceIndx = canTest && mTestAction == eTest_ActionType.Button_Assets_Replace ? (int)mTestActionArg : -1;
+            var testReplaceObj = canTest && mTestAction == eTest_ActionType.Button_Assets_Replace ? (Object)mTestActionArg2 : null;
+            var testDeleteIndx = canTest && mTestAction == eTest_ActionType.Button_Assets_Delete ? (int)mTestActionArg : -1;
 
             bool changed = GUITools.DrawObjectsArray( mProp_Assets, false, false, false, testAddObj, testReplaceObj, testReplaceIndx, testDeleteIndx);
             if (changed)
@@ -123,8 +125,8 @@ namespace I2.Loc
 
 		#region Misc
 
-		void OnGUI_ToggleEnumBig<Enum>( string text, ref Enum currentMode, Enum newMode, Texture texture, string tooltip) 	{ OnGUI_ToggleEnum<Enum>( text, ref currentMode, newMode, texture, tooltip, Style_ToolBarButton_Big); }
-		void OnGUI_ToggleEnumSmall<Enum>( string text, ref Enum currentMode, Enum newMode, Texture texture, string tooltip) { OnGUI_ToggleEnum<Enum>( text, ref currentMode, newMode, texture, tooltip, EditorStyles.toolbarButton); }
+		void OnGUI_ToggleEnumBig<Enum>( string text, ref Enum currentMode, Enum newMode, Texture texture, string tooltip) 	{ OnGUI_ToggleEnum( text, ref currentMode, newMode, texture, tooltip, Style_ToolBarButton_Big); }
+		void OnGUI_ToggleEnumSmall<Enum>( string text, ref Enum currentMode, Enum newMode, Texture texture, string tooltip) { OnGUI_ToggleEnum( text, ref currentMode, newMode, texture, tooltip, EditorStyles.toolbarButton); }
 		void OnGUI_ToggleEnum<Enum>( string text, ref Enum currentMode, Enum newMode, Texture texture, string tooltip, GUIStyle style)
 		{
 			GUI.changed = false;
@@ -138,14 +140,14 @@ namespace I2.Loc
 		
 		int OnGUI_FlagToogle( string Text, string tooltip, int flags, int bit )
 		{
-			bool State = ((flags & bit)>0);
+			bool State = (flags & bit)>0;
 			bool NewState = GUILayout.Toggle(State, new GUIContent(Text, tooltip), "toolbarbutton");
 			if (State!=NewState)
 			{
 				if (!NewState && flags==bit)
 					return flags;
 				
-				flags = (NewState ? (flags | bit)  : (flags & ~bit));
+				flags = NewState ? flags | bit  : flags & ~bit;
 			}
 			
 			return flags;
@@ -181,23 +183,23 @@ namespace I2.Loc
         }
         static bool TestButton(eTest_ActionType action, string text, GUIStyle style, params GUILayoutOption[] options)
         {
-            return GUILayout.Button(text, style, options) || (mTestAction == action && Event.current.type == EventType.Repaint);
+            return GUILayout.Button(text, style, options) || mTestAction == action && Event.current.type == EventType.Repaint;
         }
 
         static bool TestButtonArg(eTest_ActionType action, object arg, string text, GUIStyle style, params GUILayoutOption[] options)
         {
-            return GUILayout.Button(text, style, options) || (mTestAction == action && (mTestActionArg==null || mTestActionArg.Equals(arg)) && Event.current.type == EventType.Repaint);
+            return GUILayout.Button(text, style, options) || mTestAction == action && (mTestActionArg==null || mTestActionArg.Equals(arg)) && Event.current.type == EventType.Repaint;
         }
 
 
         static bool TestButton(eTest_ActionType action, GUIContent text, GUIStyle style, params GUILayoutOption[] options)
         {
-            return GUILayout.Button(text, style, options) || (mTestAction == action && Event.current.type == EventType.Repaint);
+            return GUILayout.Button(text, style, options) || mTestAction == action && Event.current.type == EventType.Repaint;
         }
 
         static bool TestButtonArg(eTest_ActionType action, object arg, GUIContent text, GUIStyle style, params GUILayoutOption[] options)
         {
-            return GUILayout.Button(text, style, options) || (mTestAction == action && (mTestActionArg == null || mTestActionArg.Equals(arg)) && Event.current.type == EventType.Repaint);
+            return GUILayout.Button(text, style, options) || mTestAction == action && (mTestActionArg == null || mTestActionArg.Equals(arg)) && Event.current.type == EventType.Repaint;
         }
 
         #endregion
@@ -214,7 +216,7 @@ namespace I2.Loc
                     GUILayout.Space(-5);
                     GUILayout.BeginVertical(GUILayout.Width(15), GUILayout.ExpandHeight(false));
                         GUILayout.Space(15);
-                        if (GUILayout.Button("X", "ToolbarSeachCancelButton", GUILayout.ExpandWidth(false)))
+                        if (GUILayout.Button("X", GUITools.Style_ToolbarSearchCancelButton, GUILayout.ExpandWidth(false)))
                             ClearErrors();
                     GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
@@ -261,14 +263,14 @@ namespace I2.Loc
 			#if UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 				return EditorApplication.currentScene;
 			#else
-				return UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
+				return SceneManager.GetActiveScene().path;
 			#endif
 		}
 
         public static void Editor_MarkSceneDirty()
         {
             #if UNITY_5_3 || UNITY_5_3_OR_NEWER
-                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             #else
                 EditorApplication.MarkSceneDirty();
             #endif
@@ -282,7 +284,7 @@ namespace I2.Loc
 			#if UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 			EditorApplication.SaveScene ();
 			#else
-			UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
+			EditorSceneManager.SaveOpenScenes();
 			#endif
 		}
 
@@ -295,9 +297,9 @@ namespace I2.Loc
                 EditorApplication.OpenScene(sceneName);
 #else
 			if (string.IsNullOrEmpty(sceneName))
-				UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.DefaultGameObjects, UnityEditor.SceneManagement.NewSceneMode.Single);
+				EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
 			else
-				UnityEditor.SceneManagement.EditorSceneManager.OpenScene(sceneName);
+				EditorSceneManager.OpenScene(sceneName);
 			#endif
 		}
 

@@ -1,8 +1,11 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace I2.Loc
 {
@@ -109,7 +112,7 @@ namespace I2.Loc
             if (!ForceUpdate && updateFrequency != eGoogleUpdateFrequency.Always)
 			{
                 #if UNITY_EDITOR
-                    string sTimeOfLastUpdate = UnityEditor.EditorPrefs.GetString("LastGoogleUpdate_"+PlayerPrefName, "");
+                    string sTimeOfLastUpdate = EditorPrefs.GetString("LastGoogleUpdate_"+PlayerPrefName, "");
                 #else
                     string sTimeOfLastUpdate = PersistentStorage.GetSetting_String("LastGoogleUpdate_"+PlayerPrefName, "");
                 #endif
@@ -137,40 +140,37 @@ namespace I2.Loc
 				{ }
 			}
             #if UNITY_EDITOR
-                UnityEditor.EditorPrefs.SetString("LastGoogleUpdate_" + PlayerPrefName, DateTime.Now.ToString());
+                EditorPrefs.SetString("LastGoogleUpdate_" + PlayerPrefName, DateTime.Now.ToString());
             #else
                 PersistentStorage.SetSetting_String("LastGoogleUpdate_"+PlayerPrefName, DateTime.Now.ToString());
             #endif
 
 			//--[ Checking google for updated data ]-----------------
-			CoroutineManager.Start(Import_Google_Coroutine(justCheck));
+			CoroutineManager.Start(Import_Google_Coroutine(ForceUpdate, justCheck));
 		}
 
 		string GetSourcePlayerPrefName()
 		{
             if (owner == null)
                 return null;
-            string sourceName = (owner as UnityEngine.Object).name;
+            string sourceName = (owner as Object).name;
             if (!string.IsNullOrEmpty(Google_SpreadsheetKey))
             {
                 sourceName += Google_SpreadsheetKey;
             }
             // If its a global source, use its name, otherwise, use the name and the level it is in
-            if (Array.IndexOf(LocalizationManager.GlobalSources, (owner as UnityEngine.Object).name)>=0)
+            if (Array.IndexOf(LocalizationManager.GlobalSources, (owner as Object).name)>=0)
 				return sourceName;
-			else
-			{
 #if UNITY_4_6 || UNITY_4_7 || UNITY_4_8 || UNITY_4_9 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 				return Application.loadedLevelName + "_" + sourceName;
 #else
-                return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name+"_"+ sourceName;
+			return SceneManager.GetActiveScene().name+"_"+ sourceName;
 #endif
-			}
 		}
 
-		IEnumerator Import_Google_Coroutine(bool JustCheck)
+		IEnumerator Import_Google_Coroutine(bool forceUpdate, bool JustCheck)
 		{
-            UnityWebRequest www = Import_Google_CreateWWWcall(false, JustCheck);
+            UnityWebRequest www = Import_Google_CreateWWWcall(forceUpdate, JustCheck);
 			if (www==null)
 				yield break;
 
@@ -178,13 +178,12 @@ namespace I2.Loc
 				yield return null;
 
 			//Debug.Log ("Google Result: " + www.text);
-			bool notError = string.IsNullOrEmpty(www.error);
-			string wwwText = null;
+			byte[] bytes = www.downloadHandler.data;
+			bool notError = string.IsNullOrEmpty(www.error) && bytes!=null;
 
 			if (notError)
 			{
-				var bytes = www.downloadHandler.data;
-				wwwText = System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length); //www.text
+				string wwwText = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
                 bool isEmpty = string.IsNullOrEmpty(wwwText) || wwwText == "\"\"";
 
@@ -374,7 +373,7 @@ namespace I2.Loc
                     Editor_SetDirty();
                 return ErrorMsg;
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogWarning(e);
                 return e.ToString();

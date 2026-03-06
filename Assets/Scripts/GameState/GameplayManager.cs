@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using AI.Interfaces;
 using Analytic.Interfaces;
 using Cards.CustomType;
@@ -71,7 +71,7 @@ namespace GameState
         (
             IAIService aiService,
              IGameSceneService gameSceneService,
-             IPlayerService playerService, 
+             IPlayerService playerService,
              IScoreService scoreService,
              ICoroutineService coroutineService,
              IHandPoolManipulator handPoolManipulator,
@@ -157,14 +157,14 @@ namespace GameState
 
                     _inGameUIService.SetIsOnlineGame(_isOnline);
                     _networkEventService.SetIsOnline(_isOnline);
-                    
+
                     _playerService.SetGameType(_gameTypeService.GetGameType());
 
                     SetGameplayState(GameplayState.NewRound);
                     _coroutineService.AddCoroutine(
                         _inGameUIService.IShowNewTurnAnimation(
-                            (CellFigure) _playerService.GetCurrentSideOnDevice()));
-                    
+                            (CellFigure)_playerService.GetCurrentSideOnDevice()));
+
                     break;
 
                 case GameplayState.NewTurn:
@@ -179,7 +179,7 @@ namespace GameState
                     _manaService.SetBonusMana(0);
 
                     _coroutineService.AddCoroutine(
-                        _inGameUIService.IShowNewTurnAnimation((CellFigure) _playerService.GetCurrentPlayer()
+                        _inGameUIService.IShowNewTurnAnimation((CellFigure)_playerService.GetCurrentPlayer()
                             .SideId));
 
 
@@ -190,7 +190,8 @@ namespace GameState
                         _coroutineService.AddCoroutine(_effectService.UpdateEffectTurn());
                     }
 
-                    _turnTimerService.StartNewTurnTimer(_playerService.GetCurrentPlayer().EntityType,
+                    if (_isOnline)
+                        _turnTimerService.StartNewTurnTimer(_playerService.GetCurrentPlayer().EntityType,
                         (!_isOnline || _playerService.GetCurrentPlayer().SideId ==
                             Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber)
                             ? () =>
@@ -198,7 +199,7 @@ namespace GameState
                                 SetGamePlayStateQueue(GameplayState.NewTurn);
                                 _checkEventNetworkService.RaiseEventEndTurn();
                             }
-                            : null);
+                        : null);
 
                     _manaService.RestoreAllMana();
                     _manaUIService.UpdateManaUI();
@@ -313,16 +314,16 @@ namespace GameState
                     _handPoolView.ChangeCurrentPlayerView(_playerService.GetCurrentPlayerOnDevice());
                     _scoreService.ClearAllScore();
                     _handPoolView.UpdateCardPosition(false);
-
-                    _turnTimerService.StartNewTurnTimer(_playerService.GetCurrentPlayer().EntityType,
-                        (!_isOnline || _playerService.GetCurrentPlayer().SideId ==
-                            Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber)
-                            ? () =>
-                            {
-                                SetGamePlayStateQueue(GameplayState.NewTurn);
-                                _checkEventNetworkService.RaiseEventEndTurn();
-                            }
-                            : null);
+                    if (_isOnline)
+                        _turnTimerService.StartNewTurnTimer(_playerService.GetCurrentPlayer().EntityType,
+                            (!_isOnline || _playerService.GetCurrentPlayer().SideId ==
+                                Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber)
+                                ? () =>
+                                {
+                                    SetGamePlayStateQueue(GameplayState.NewTurn);
+                                    _checkEventNetworkService.RaiseEventEndTurn();
+                                }
+                        : null);
 
 
                     _inGameUIService.NewTurn();
@@ -335,7 +336,7 @@ namespace GameState
             }
         }
 
-        
+
 
         public void SetGameplayState(GameplayState state)
         {

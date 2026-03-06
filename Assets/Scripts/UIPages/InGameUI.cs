@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Analytic.Interfaces;
@@ -305,6 +305,8 @@ namespace UIPages
         private IEnumerator ITimerProcess()
         {
             _timerPanel.SetActive(false);
+            if (!_isOnlineGame)
+                yield break;
 
             while (_timerEnableTime < _turnTimerService.GetTimeLeft()) yield return null;
 

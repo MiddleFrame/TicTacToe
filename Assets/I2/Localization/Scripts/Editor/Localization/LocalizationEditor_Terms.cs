@@ -1,7 +1,8 @@
-using UnityEngine;
-using UnityEditor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 namespace I2.Loc
 {
@@ -25,19 +26,20 @@ namespace I2.Loc
 		{
 			Used = 1<<1,
 			Missing = 1<<2, 
-			NotUsed = 1<<3
-		};
-		public static int mFlagsViewKeys = ((int)eFlagsViewKeys.Used | (int)eFlagsViewKeys.NotUsed);
+			NotUsed = 1<<3,
+			Untranslated = 1<<4,
+		}
+		public static int mFlagsViewKeys = (int)eFlagsViewKeys.Used | (int)eFlagsViewKeys.NotUsed;
 
-		public static string mTermsList_NewTerm = null;
+		public static string mTermsList_NewTerm;
 		Rect mKeyListFilterRect;
 
 		#endregion
 		
 		#region GUI Key List
 
-		float ExpandedViewHeight = 0;
-		float TermsListHeight = 0;
+		float ExpandedViewHeight;
+		float TermsListHeight;
 
 		void OnGUI_KeysList(bool AllowExpandKey = true, float Height = 300.0f, bool ShowTools=true)
 		{
@@ -66,6 +68,9 @@ namespace I2.Loc
 			mFlagsViewKeys = OnGUI_FlagToogle("Used","Shows All Terms referenced in the parsed scenes", 				mFlagsViewKeys, (int)eFlagsViewKeys.Used);
 			mFlagsViewKeys = OnGUI_FlagToogle("Not Used", "Shows all Terms from the Source that are not been used", 	mFlagsViewKeys, (int)eFlagsViewKeys.NotUsed);
 			mFlagsViewKeys = OnGUI_FlagToogle("Missing","Shows all Terms Used but not defined in the Source", 			mFlagsViewKeys, (int)eFlagsViewKeys.Missing);
+
+			mFlagsViewKeys = OnGUI_FlagToogle("Untranslated", "Shows all Terms that were not translated to any language", mFlagsViewKeys, (int)eFlagsViewKeys.Untranslated);
+
 			if (oldFlags!=mFlagsViewKeys)
                 ScheduleUpdateTermsToShowInList();
 
@@ -120,7 +125,7 @@ namespace I2.Loc
 				YPosMin += mRowSize;
 				SkipSize += mRowSize;
 				float YPosMax = YPosMin + mRowSize;
-				bool isExpanded = (AllowExpandKey && mKeyToExplore==FullKey);
+				bool isExpanded = AllowExpandKey && mKeyToExplore==FullKey;
 				if (!isExpanded && (YPosMax<-2*mRowSize || YPosMin>/*Screen.height*/TermsListHeight+mRowSize))
 				{
 					if (YPosMin>TermsListHeight+mRowSize)
@@ -180,7 +185,7 @@ namespace I2.Loc
 			if (ShowTools)
 			{
 				GUILayout.BeginHorizontal();
-				GUI.enabled = (mSelectedKeys.Count>0 || !string.IsNullOrEmpty(mKeyToExplore));
+				GUI.enabled = mSelectedKeys.Count>0 || !string.IsNullOrEmpty(mKeyToExplore);
 					if (TestButton (eTest_ActionType.Button_AddSelectedTerms, new GUIContent("Add Terms", "Add terms to Source"), "Button", GUITools.DontExpandWidth)) 		 AddTermsToSource();
 					if (TestButton (eTest_ActionType.Button_RemoveSelectedTerms, new GUIContent("Remove Terms", "Remove Terms from Source"), "Button", GUITools.DontExpandWidth)) 	 RemoveTermsFromSource();
 
@@ -211,7 +216,7 @@ namespace I2.Loc
                 mUpdateShowTermIsScheduled = true;
             }
         }
-        static bool mUpdateShowTermIsScheduled = false;
+        static bool mUpdateShowTermIsScheduled;
 		static void UpdateTermsToShownInList()
 		{
             EditorApplication.update -= UpdateTermsToShownInList;
@@ -276,7 +281,7 @@ namespace I2.Loc
 			GUI.color = Color.white;
 
 			TermData termData = ShowTerm_termData!=null ? ShowTerm_termData : mLanguageSource.GetTermData (FullKey);
-			bool bKeyIsMissing = (termData == null);
+			bool bKeyIsMissing = termData == null;
 			float MinX = 50;
 			if (bKeyIsMissing) 
 			{
@@ -351,7 +356,7 @@ namespace I2.Loc
 
         void CalculateTermsListMaxWidth()
 		{
-            mTermList_MaxWidth = (EditorGUIUtility.currentViewWidth / EditorGUIUtility.pixelsPerPoint) - 120;
+            mTermList_MaxWidth = EditorGUIUtility.currentViewWidth / EditorGUIUtility.pixelsPerPoint - 120;
             /*float maxWidth = Screen.width / 18;
 			foreach (KeyValuePair<string, ParsedTerm> kvp in mParsedTerms)
 			{
@@ -368,7 +373,7 @@ namespace I2.Loc
             if (source==null) source = LocalizationManager.Sources[0];
 			for (int i=0, imax=data.Languages.Length; i<imax; ++i)
 			{
-				bool isLangEnabled = (source.mLanguages.Count>i) ? source.mLanguages[i].IsEnabled() : true;
+				bool isLangEnabled = source.mLanguages.Count>i ? source.mLanguages[i].IsEnabled() : true;
 				if (string.IsNullOrEmpty(data.Languages[i]) && isLangEnabled)
 					return false;
 			}
@@ -379,7 +384,7 @@ namespace I2.Loc
 		{
 			GUILayout.BeginHorizontal();
 				GUI.color = Color.Lerp(Color.gray, Color.white, 0.5f);
-				bool bWasEnabled = (mTermsList_NewTerm!=null);
+				bool bWasEnabled = mTermsList_NewTerm!=null;
 				bool bEnabled = !GUILayout.Toggle (!bWasEnabled, "+", EditorStyles.toolbarButton, GUILayout.Width(30));
 				GUI.color = Color.white;
 
@@ -455,14 +460,14 @@ namespace I2.Loc
                     var category = parsedList[i];
                     var nextCategory = i + 1 < imax ? parsedList[i + 1] : null;
 
-                    bool isHeader = (nextCategory != null && nextCategory.StartsWith(category + "/"));
+                    bool isHeader = nextCategory != null && nextCategory.StartsWith(category + "/");
 
                     var displayName = category;
                     var categoryRoot = category;
                     if (isHeader)
                     {
                         categoryRoot += "/";
-                        var newCateg = (!category.Contains('/')) ? category : category.Substring(category.LastIndexOf('/') + 1);
+                        var newCateg = !category.Contains('/') ? category : category.Substring(category.LastIndexOf('/') + 1);
                         displayName = categoryRoot + newCateg;
                     }
 
@@ -475,7 +480,7 @@ namespace I2.Loc
 
                             if (isHeader)
                             {
-                                mSelectedCategories.RemoveAll((x) => x.StartsWith(CatHeader));
+                                mSelectedCategories.RemoveAll(x => x.StartsWith(CatHeader));
                             }
                         }
                         else
@@ -514,7 +519,7 @@ namespace I2.Loc
 			if (!string.IsNullOrEmpty(data))
 			{
 				mSelectedCategories.Clear ();
-				mSelectedCategories.AddRange( data.Split(",".ToCharArray(), System.StringSplitOptions.RemoveEmptyEntries));
+				mSelectedCategories.AddRange( data.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
 			}
 		}
 
@@ -534,7 +539,7 @@ namespace I2.Loc
 			if (GUILayout.Button( new GUIContent( "None", "Clears the selection" ), "toolbarbutton", GUILayout.ExpandWidth( false ) )) { mSelectedKeys.Clear(); }
 			GUILayout.Space( 5 );
 
-			GUI.enabled = ((mFlagsViewKeys & (int)eFlagsViewKeys.Used)>1);
+			GUI.enabled = (mFlagsViewKeys & (int)eFlagsViewKeys.Used)>1;
 			if (TestButton(eTest_ActionType.Button_SelectTerms_Used, new GUIContent( "Used", "Selects All Terms referenced in the parsed scenes" ), "toolbarbutton", GUILayout.ExpandWidth( false ) ))
 			{
 				mSelectedKeys.Clear();
@@ -542,7 +547,7 @@ namespace I2.Loc
 					if (kvp.Value.Usage > 0 && ShouldShowTerm( kvp.Value.Term, kvp.Value.Category, kvp.Value.Usage ))
 						mSelectedKeys.Add( kvp.Key );
 			}
-			GUI.enabled = ((mFlagsViewKeys & (int)eFlagsViewKeys.NotUsed)>1);
+			GUI.enabled = (mFlagsViewKeys & (int)eFlagsViewKeys.NotUsed)>1;
 			if (GUILayout.Button( new GUIContent( "Not Used", "Selects all Terms from the Source that are not been used" ), "toolbarbutton", GUILayout.ExpandWidth( false ) ))
 			{
 				mSelectedKeys.Clear();
@@ -551,7 +556,7 @@ namespace I2.Loc
 						mSelectedKeys.Add( kvp.Key );
 			}
 
-			GUI.enabled = ((mFlagsViewKeys & (int)eFlagsViewKeys.Missing)>1);
+			GUI.enabled = (mFlagsViewKeys & (int)eFlagsViewKeys.Missing)>1;
 			if (TestButton(eTest_ActionType.Button_SelectTerms_Missing, new GUIContent( "Missing", "Selects all Terms Used but not defined in the Source" ), "toolbarbutton", GUILayout.ExpandWidth( false ) ))
 			{
 				mSelectedKeys.Clear();
@@ -559,22 +564,32 @@ namespace I2.Loc
 					if (!mLanguageSource.ContainsTerm( kvp.Key ) && ShouldShowTerm( kvp.Value.Term, kvp.Value.Category, kvp.Value.Usage ))
 						mSelectedKeys.Add( kvp.Key );
 			}
+
+			GUI.enabled = ((mFlagsViewKeys & (int)eFlagsViewKeys.Untranslated) > 1);
+			if (GUILayout.Button(new GUIContent("Untranslated", "Selects all Terms from the Source that are not translated to any language"), "toolbarbutton", GUILayout.ExpandWidth(false)))
+			{
+				mSelectedKeys.Clear();
+				foreach (var kvp in mParsedTerms)
+					if (kvp.Value.termData.Languages.All(o => string.IsNullOrEmpty(o)) && ShouldShowTerm(kvp.Value.Term, kvp.Value.Category, kvp.Value.Usage))
+						mSelectedKeys.Add(kvp.Key);
+			}
+
 			GUI.enabled = true;
 			EditorGUI.BeginChangeCheck();
 
 			// Terms Filter
 			{
-				//KeyList_Filter = EditorGUILayout.TextField(KeyList_Filter, GUI.skin.GetStyle("ToolbarSeachTextField"), GUILayout.ExpandWidth(true));
+				//KeyList_Filter = EditorGUILayout.TextField(KeyList_Filter, GUI.skin.GetStyle(GUITools.Style_ToolbarSearchTextField), GUILayout.ExpandWidth(true));
 				GUILayout.Label( "", GUILayout.ExpandWidth( true ) );
 				mKeyListFilterRect = GUILayoutUtility.GetLastRect();
                 mKeyListFilterRect.xMax += 4;
 
-                KeyList_Filter = GUITools.TextField( mKeyListFilterRect, KeyList_Filter, 255, GUI.skin.GetStyle( "ToolbarSeachTextField" ), KeyListFilterID );
+                KeyList_Filter = GUITools.TextField( mKeyListFilterRect, KeyList_Filter, 255, GUI.skin.GetStyle( GUITools.Style_ToolbarSearchTextField ), KeyListFilterID );
 			}
 
 
 
-			if (GUILayout.Button( string.Empty, string.IsNullOrEmpty( KeyList_Filter ) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton", GUILayout.ExpandWidth( false ) ))
+			if (GUILayout.Button( string.Empty, string.IsNullOrEmpty( KeyList_Filter ) ? GUITools.Style_ToolbarSearchCancelButtonEmpty : GUITools.Style_ToolbarSearchCancelButton, GUILayout.ExpandWidth( false ) ))
 			{
 				KeyList_Filter = string.Empty;
 				EditorApplication.update += RepaintScene;
@@ -636,9 +651,8 @@ namespace I2.Loc
 					parsedTerm.termData = ShowTerm_termData;
 			}
 
-
             var filter = KeyList_Filter.Trim();
-            bool useTranslation = filter.StartsWith("f ", System.StringComparison.OrdinalIgnoreCase);
+            bool useTranslation = filter.StartsWith("f ", StringComparison.OrdinalIgnoreCase);
             if (useTranslation)
             {
                 if (ShowTerm_termData == null)
@@ -648,21 +662,23 @@ namespace I2.Loc
                 if (!string.IsNullOrEmpty(filter))
                 {
                     bool hasFilter = false;
-                    for (int i = 0; i < ShowTerm_termData.Languages.Length; ++i)
-                    {
-                        if (!string.IsNullOrEmpty(ShowTerm_termData.Languages[i]) && StringContainsFilter(ShowTerm_termData.Languages[i], filter))
-                        {
-                            hasFilter = true;
-                            break;
-                        }
-                    }
+					for (int i = 0; i < ShowTerm_termData.Languages.Length; ++i)
+					{
+						if (!string.IsNullOrEmpty(ShowTerm_termData.Languages[i]) 
+							&& StringContainsFilter(ShowTerm_termData.Languages[i], filter))
+						{
+							hasFilter = true;
+							break;
+						}
+						
+					}
                     if (!hasFilter)
                         return false;
                 }
             }
             else
             {
-                bool onlyCategory = filter.StartsWith("c ", System.StringComparison.OrdinalIgnoreCase);
+                bool onlyCategory = filter.StartsWith("c ", StringComparison.OrdinalIgnoreCase);
                 if (onlyCategory)
                     filter = filter.Substring(2).Trim();
 
@@ -678,7 +694,12 @@ namespace I2.Loc
 
 
             bool bIsMissing = ShowTerm_termData == null;
+			bool hasTranslation = !bIsMissing && ShowTerm_termData.Languages.Any(o => !string.IsNullOrEmpty(o));
+
+			if ((mFlagsViewKeys & (int)eFlagsViewKeys.Untranslated) > 0) return !hasTranslation;
+
 			if (nUses<0) return true;
+
 
 			if ((mFlagsViewKeys & (int)eFlagsViewKeys.Missing)>0 && bIsMissing) return true;
 			if ((mFlagsViewKeys & (int)eFlagsViewKeys.Missing)==0 && bIsMissing) return false;
@@ -696,7 +717,7 @@ namespace I2.Loc
             if (Term == "-")
                 return false;
             Term = Term.ToLower();
-            string[] Filters = Filter.ToLower().Split(";, ".ToCharArray(), System.StringSplitOptions.RemoveEmptyEntries);
+            string[] Filters = Filter.ToLower().Split(";, ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0, imax = Filters.Length; i < imax; ++i)
                 if (Term.Contains(Filters[i]))
                     return true;

@@ -1,16 +1,17 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace I2.Loc
 {
     #if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoad] 
+    [InitializeOnLoad] 
     #endif
 
-    public class LocalizeTarget_UnityUI_Text : LocalizeTarget<UnityEngine.UI.Text>
+    public class LocalizeTarget_UnityUI_Text : LocalizeTarget<Text>
 	{
         static LocalizeTarget_UnityUI_Text() { AutoRegister(); }
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Type<Text, LocalizeTarget_UnityUI_Text>() { Name = "Text", Priority = 100 }); }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] static void AutoRegister() { LocalizationManager.RegisterTarget(new LocalizeTargetDesc_Type<Text, LocalizeTarget_UnityUI_Text> { Name = "Text", Priority = 100 }); }
 
         TextAnchor mAlignment_RTL = TextAnchor.UpperRight;
 		TextAnchor mAlignment_LTR = TextAnchor.UpperLeft;
@@ -26,7 +27,7 @@ namespace I2.Loc
 		public override void GetFinalTerms ( Localize cmp, string Main, string Secondary, out string primaryTerm, out string secondaryTerm )
 		{
             primaryTerm = mTarget ? mTarget.text : null;
-            secondaryTerm = (mTarget.font!=null ? mTarget.font.name : string.Empty); ;
+            secondaryTerm = mTarget.font!=null ? mTarget.font.name : string.Empty;
 		}
 
 
@@ -48,8 +49,8 @@ namespace I2.Loc
 				TextAnchor alignRTL, alignLTR;
 				InitAlignment( mAlignmentWasRTL, mTarget.alignment, out alignLTR, out alignRTL );
 
-				if ((mAlignmentWasRTL && mAlignment_RTL!=alignRTL) ||
-					(!mAlignmentWasRTL && mAlignment_LTR != alignLTR))
+				if (mAlignmentWasRTL && mAlignment_RTL!=alignRTL ||
+					!mAlignmentWasRTL && mAlignment_LTR != alignLTR)
 				{
 					mAlignment_LTR = alignLTR;
 					mAlignment_RTL = alignRTL;
@@ -71,7 +72,7 @@ namespace I2.Loc
 				// In the editor, sometimes unity "forgets" to show the changes
                 #if UNITY_EDITOR
 				if (!Application.isPlaying)
-					UnityEditor.EditorUtility.SetDirty( mTarget );
+					EditorUtility.SetDirty( mTarget );
                 #endif
 			}
 		}
