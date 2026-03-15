@@ -6,11 +6,14 @@ using Theme.Interfaces;
 using Zenject;
 
 
+
 public class Cell : MonoBehaviour
 {
     private const float SCALE_COUNT_FRAME = 25;
     private const float POSITION_COUNT_FRAME = 25;
     private const float FIGURE_COUNT_FRAME = 25;
+
+    private const float FIGURE_SCALE_DURATION = 0.6f;
 
     #region Dependency
 
@@ -103,7 +106,7 @@ public class Cell : MonoBehaviour
                 break;
             case CellFigure.P1:
                 _image.fillMethod = Image.FillMethod.Vertical;
-                _image.fillOrigin = 0; 
+                //_image.fillOrigin = 0; 
                 if (isNeedPlace)
                 {
                     if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false));
@@ -112,7 +115,7 @@ public class Cell : MonoBehaviour
                 break;
             case CellFigure.P2:
                 _image.fillMethod = Image.FillMethod.Radial360;
-                _image.fillOrigin = 0;
+                //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
                     if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false));
@@ -137,7 +140,7 @@ public class Cell : MonoBehaviour
                 break;
             case CellFigure.P1:
                 _image.fillMethod = Image.FillMethod.Vertical;
-                _image.fillOrigin = 0;
+                //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
                     if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, false));
@@ -146,7 +149,7 @@ public class Cell : MonoBehaviour
                 break;
             case CellFigure.P2:
                 _image.fillMethod = Image.FillMethod.Radial360;
-                _image.fillOrigin = 0;
+                //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
                     if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, false));
@@ -291,6 +294,7 @@ public class Cell : MonoBehaviour
     }
 
     private IEnumerator IFigureFillProcess(CellFigure s, bool reverse)
+    /*
     {        
         if (!reverse)
         {
@@ -312,6 +316,51 @@ public class Cell : MonoBehaviour
         _isFigureCoroutineWork = false;
         _figure = s;
 
+    }*/
+
+
+
+    {
+        if (!reverse)
+            _image.sprite = _themeService.GetSprite(s);
+        else {_figure = s; _image.sprite = _themeService.GetSprite(s); yield break;}
+        _isFigureCoroutineWork = true;
+
+        Vector3 from = reverse ? Vector3.one : Vector3.one * 0.5f;
+        Vector3 to   = reverse ? Vector3.one * 0.5f : Vector3.one;
+
+        float time = 0f;
+
+        while (time < FIGURE_SCALE_DURATION)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / FIGURE_SCALE_DURATION);
+
+            float eased = QuickEase(t);
+
+            _image.rectTransform.localScale = Vector3.LerpUnclamped(from, to, eased);
+            yield return null;
+        }
+
+        _image.rectTransform.localScale = to;
+
+        if (reverse)
+            _image.sprite = _themeService.GetSprite(s);
+
+        _isFigureCoroutineWork = false;
+        _figure = s;
+    }
+
+    private float QuickEase(float t)
+    {
+        t = Mathf.Clamp01(t);
+
+        float c4 = (2f * Mathf.PI) / 3f;
+
+        if (t == 0f) return 0f;
+        if (t == 1f) return 1f;
+
+        return Mathf.Pow(2f, -10f * t) * Mathf.Sin((t * 10f - 0.75f) * c4) + 1f;
     }
 
     private IEnumerator ISubStateFillProcess(Sprite s, Color32 color, bool reverse)

@@ -118,7 +118,11 @@ namespace Cards.CustomType
         {
             if (!_handPoolView.IsCurrentPlayerOnSlot()) return;
 
-            Vector2 vectorFigure = _cardView.GetPositionWithDistance(Input.mousePosition);
+            // Card position based on Finger position 
+            //Vector2 vectorFigure = _cardView.GetPositionWithDistance(Input.mousePosition);
+
+            // Card position based on Card center
+            Vector2 vectorFigure = Camera.main.WorldToScreenPoint(_cardView.transform.position);
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
      _parentRect,
@@ -145,13 +149,16 @@ namespace Cards.CustomType
                 _cardView.HideTip(true);
             }
 
-           /* if (_lastAlphaState == _fieldService.IsInFieldHeight(vectorFigure.y))
+           /* 
+           // card invisibility
+           
+           if (_lastAlphaState == _fieldService.IsInFieldHeight(vectorFigure.y))
             {
                 _lastAlphaState = !_lastAlphaState;
                 SetGroupAlpha(_lastAlphaState ? 1 : 0, false);
             }*/
+            _chosenCell = _fieldService.GetIdFromPosition(vectorFigure+new Vector2(0,170), false);
 
-            _chosenCell = _fieldService.GetIdFromPosition(vectorFigure, false);
             if (_prevChosenCell != _chosenCell)
             {
                 if (_prevChosenCell != new Vector2Int(-1, -1))
