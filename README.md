@@ -1,3 +1,5 @@
+![banner](/Assets/readme_images/banner.png)
+
 # TicTacToe Plus
 
 Did you ever love Tic-Tac-Toe, but it quickly became predictable? Tired of endless draws?  
