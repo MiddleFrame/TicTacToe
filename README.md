@@ -1,4 +1,4 @@
-![banner](/Assets/readme_images/banner.png)
+![banner](/readme_images/banner.png)
 
 # TicTacToe Plus
 
