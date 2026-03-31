@@ -6,6 +6,7 @@ namespace UIPages.Interfaces
     public interface IInGameUIService
     {
         public void UpdateScore(int score1Player, int score2Player);
+        public void SetupMaxScore(int score1Player, int score2Player);
         public void UpdatePlayerRP(int score1Player, int score2Player);
         public IEnumerator ShowRoundOverAnimation();
         public IEnumerator IShowNewTurnAnimation(CellFigure cellFigure);

@@ -24,6 +24,12 @@ namespace UIPages
 {
     public class InGameUI : MonoBehaviour, IInGameUIService
     {
+
+        [SerializeField]
+        private Slider _enemyHpSlider;
+        [SerializeField]
+        private Slider _playerHpSlider;
+
         [SerializeField]
         private TextMeshProUGUI _playerOneScoreText;
 
@@ -124,6 +130,7 @@ namespace UIPages
         private Image _paperNewTurnPlayerImage;
 
 
+
         private static readonly int newTurn = Animator.StringToHash("NewTurn");
         private static readonly int xTurn = Animator.StringToHash("XTurn");
         private static readonly int oTurn = Animator.StringToHash("OTurn");
@@ -212,11 +219,18 @@ namespace UIPages
             _animatorNewTurn.ResetTrigger(xTurn);
             _animatorNewTurn.ResetTrigger(oTurn);
         }
+        public void SetupMaxScore(int firstPlayer, int secondPlayer)
+        {
+            _playerHpSlider.maxValue = firstPlayer;
+            _enemyHpSlider.maxValue = secondPlayer;
+        }
 
         public void UpdateScore(int score1Player, int score2Player)
         {
-            _playerOneScoreText.text = score1Player.ToString();
-            _playerTwoScorText.text = score2Player.ToString();
+            _playerOneScoreText.text = score1Player+"/"+ _playerHpSlider.maxValue;
+            _playerHpSlider.value = score1Player;
+            _playerTwoScorText.text = score2Player+"/" + _enemyHpSlider.maxValue;
+            _enemyHpSlider.value = score2Player;
         }
 
         public void UpdatePlayerRP(int score1Player, int score2Player)

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Score.Interfaces;
 using UIPages.Interfaces;
 using UnityEngine;
@@ -10,15 +10,21 @@ namespace Score
     {
         private readonly Dictionary<int, int> _currentScoreList = new Dictionary<int, int>();
 
+        private readonly Dictionary<int, int> _winScoreList = new Dictionary<int, int>();
+
         private List<int> _roundWinner = new List<int>();
 
-        private const int SCORE_FOR_WIN = 20;
         private const int ROUND_FOR_WIN = 2;
         private const int MAX_ROUNDS = 3;
 
         public int GetScore(int player)
         {
             return _currentScoreList[player];
+        }
+
+        public int GetMaxScore(int player)
+        {
+            return _winScoreList[player];
         }
 
         public void SetScore(int player, int value)
@@ -35,11 +41,13 @@ namespace Score
         public void AddPlayer(int player)
         {
             _currentScoreList.Add(player, 0);
+            _winScoreList.Add(player, 20);
         }
 
         public void RemovePlayer(int player)
         {
             _currentScoreList.Remove(player);
+            _winScoreList.Remove(player);
         }
 
         public void ClearAllScore()
@@ -56,7 +64,7 @@ namespace Score
         {
             foreach (int res in _currentScoreList.Keys)
             {
-                if (_currentScoreList[res] >= SCORE_FOR_WIN) return true;
+                if (_currentScoreList[res] >= _winScoreList[res]) return true;
             }
 
             return false;

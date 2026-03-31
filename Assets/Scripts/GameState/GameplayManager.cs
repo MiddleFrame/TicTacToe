@@ -328,6 +328,7 @@ namespace GameState
 
                     _inGameUIService.NewTurn();
                     _inGameUIService.SetSideBannerTurn(1);
+                    _inGameUIService.SetupMaxScore(_scoreService.GetMaxScore(1), _scoreService.GetMaxScore(2));
                     _inGameUIService.UpdateScore(0, 0);
                     _inGameUIService.UpdatePlayerRP(
                         _scoreWinnerService.GetCountRoundWin(1),

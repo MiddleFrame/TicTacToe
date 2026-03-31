@@ -3032,6 +3032,7 @@ GameObject:
   - component: {fileID: 262069376}
   - component: {fileID: 262069378}
   - component: {fileID: 262069377}
+  - component: {fileID: 262069379}
   m_Layer: 5
   m_Name: pattern_1
   m_TagString: Untagged
@@ -3053,10 +3054,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2131125978}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 8.746}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -7.73999, y: -24.689941}
-  m_SizeDelta: {x: 344, y: 341.19995}
+  m_SizeDelta: {x: 4872.47, y: 3654.56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &262069377
 MonoBehaviour:
@@ -3072,7 +3073,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.047058824}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -3096,6 +3097,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 262069375}
   m_CullTransparentMesh: 1
+--- !u!95 &262069379
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262069375}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 55adf59294229194da8098d64bf1bba7, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &273030631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4003,7 +4026,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 53.59, y: 35.76}
+  m_SizeDelta: {x: 54.57, y: 37.51}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &368998850
 MonoBehaviour:
@@ -4043,8 +4066,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 220
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 21562d6efbefd994c8df933592768d10, type: 2}
+  m_sharedMaterial: {fileID: -7108447791044034322, guid: 21562d6efbefd994c8df933592768d10, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
