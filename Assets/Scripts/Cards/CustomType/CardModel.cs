@@ -29,7 +29,7 @@ namespace Cards.CustomType
 
         private bool _lastAlphaState = true;
         private bool _isSlotsReUpdatePositions;
-
+        private float _heightCard;
         #region Dependency
 
         private IPlayerService _playerService;
@@ -92,6 +92,13 @@ namespace Cards.CustomType
 
             _fingerOffset = (Vector2)_cardRect.localPosition - localPoint;
 
+            Vector3[] corners = new Vector3[4];
+            _cardRect.GetWorldCorners(corners);
+
+            Vector2 bottom = Camera.main.WorldToScreenPoint(corners[0]);
+            Vector2 top = Camera.main.WorldToScreenPoint(corners[1]);
+
+            _heightCard = top.y - bottom.y;
             _lastAlphaState = true;
             _chosenCell = new Vector2Int(-1, -1);
             SetTransformRotation(0);
@@ -149,15 +156,16 @@ namespace Cards.CustomType
                 _cardView.HideTip(true);
             }
 
-           /* 
-           // card invisibility
-           
-           if (_lastAlphaState == _fieldService.IsInFieldHeight(vectorFigure.y))
-            {
-                _lastAlphaState = !_lastAlphaState;
-                SetGroupAlpha(_lastAlphaState ? 1 : 0, false);
-            }*/
-            _chosenCell = _fieldService.GetIdFromPosition(vectorFigure+new Vector2(0,170), false);
+            /* 
+            // card invisibility
+
+            if (_lastAlphaState == _fieldService.IsInFieldHeight(vectorFigure.y))
+             {
+                 _lastAlphaState = !_lastAlphaState;
+                 SetGroupAlpha(_lastAlphaState ? 1 : 0, false);
+             }*/
+
+            _chosenCell = _fieldService.GetIdFromPosition(vectorFigure+new Vector2(0, _heightCard), false);
 
             if (_prevChosenCell != _chosenCell)
             {
