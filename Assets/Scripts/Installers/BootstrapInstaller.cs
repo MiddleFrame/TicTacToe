@@ -107,6 +107,7 @@ public class BootstrapInstaller : MonoInstaller, IInitializable
         Application.targetFrameRate = 60;
         Container.Resolve<IVibrationService>().Init();
         Container.Resolve<ISettingsDataService>().LoadLanguage();
+        Container.Resolve<ISettingsDataService>().LoadCellClearAnimationType();
 #if UNITY_IAP
         Container.Resolve<IIAPService>().IAPInitializate();
 #endif

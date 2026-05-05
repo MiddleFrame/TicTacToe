@@ -32,6 +32,9 @@ namespace UIPages
         [SerializeField]
         private GameObject _tutorialNotShowedArea;
 
+        [Header("Settings properties"), SerializeField]
+        private TMP_Dropdown _cellClearAnimationDropdown;
+
         private static bool _isConnectedToMasterState = false;
 
         #region Dependency
@@ -68,11 +71,13 @@ namespace UIPages
             Debug.Log($"TutorialManager.IsTutorialShowed {_tutorialCompleteService.GetIsTutorialComplete()}");
             _tutorialShowedArea.SetActive(_tutorialCompleteService.GetIsTutorialComplete());
             _tutorialNotShowedArea.SetActive(!_tutorialCompleteService.GetIsTutorialComplete());
+            SyncCellClearAnimationDropdown();
         }
 
         private void OnEnable()
         {
             UpdateTexts();
+            SyncCellClearAnimationDropdown();
         }
 
         public void UpdateTexts()
@@ -138,6 +143,23 @@ namespace UIPages
             _settingsDataService.SetLanguage((_settingsDataService.GetLanguage()) == "ru"
                 ? ISettingsDataService.Language.en
                 : ISettingsDataService.Language.ru);
+        }
+
+        public void ChangeCellClearAnimation(int animationType)
+        {
+            _settingsDataService.SetCellClearAnimationType(animationType);
+            SyncCellClearAnimationDropdown();
+        }
+
+        public int GetCellClearAnimationType()
+        {
+            return (int) _settingsDataService.GetCellClearAnimationType();
+        }
+
+        public void SyncCellClearAnimationDropdown()
+        {
+            if (_cellClearAnimationDropdown == null) return;
+            _cellClearAnimationDropdown.SetValueWithoutNotify(GetCellClearAnimationType());
         }
     }
 }

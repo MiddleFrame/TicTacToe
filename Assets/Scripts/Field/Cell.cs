@@ -52,6 +52,7 @@ public class Cell : MonoBehaviour
     private Vector2 _position;
     private bool _isPositionCoroutineWork;
     private bool _isFigureCoroutineWork = false;
+    private int _figureAnimationVersion;
 
     public Vector2Int Id
     {
@@ -94,14 +95,15 @@ public class Cell : MonoBehaviour
     {
         if (!isNeedPlace)
             _figure = (CellFigure)s;
+        _figureAnimationVersion++;
 
         switch ((CellFigure)s)
         {
             case CellFigure.None:
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, true));
-                    else StartCoroutine(IFigureFillProcess((CellFigure)s, true));
+                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, true, _figureAnimationVersion));
+                    else StartCoroutine(IFigureFillProcess((CellFigure)s, true, _figureAnimationVersion));
                 }
                 break;
             case CellFigure.P1:
@@ -109,8 +111,8 @@ public class Cell : MonoBehaviour
                 //_image.fillOrigin = 0; 
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false));
-                    else StartCoroutine(IFigureFillProcess((CellFigure)s, false));
+                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
+                    else StartCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
                 }
                 break;
             case CellFigure.P2:
@@ -118,8 +120,8 @@ public class Cell : MonoBehaviour
                 //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false));
-                    else StartCoroutine(IFigureFillProcess((CellFigure)s, false));
+                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
+                    else StartCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
                 }
                 break;
 
@@ -129,13 +131,14 @@ public class Cell : MonoBehaviour
     public void SetFigure(CellFigure s, bool isNeedPlace = true, bool isQueue = true)
     {
         _figure = s;
+        _figureAnimationVersion++;
         switch (s)
         {
             case CellFigure.None:
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, true));
-                    else StartCoroutine(IFigureFillProcess(s, true));
+                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, true, _figureAnimationVersion));
+                    else StartCoroutine(IFigureFillProcess(s, true, _figureAnimationVersion));
                 }
                 break;
             case CellFigure.P1:
@@ -143,8 +146,8 @@ public class Cell : MonoBehaviour
                 //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, false));
-                    else StartCoroutine(IFigureFillProcess(s, false));
+                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
+                    else StartCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
                 }
                 break;
             case CellFigure.P2:
@@ -152,8 +155,8 @@ public class Cell : MonoBehaviour
                 //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, false));
-                    else StartCoroutine(IFigureFillProcess(s, false));
+                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
+                    else StartCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
                 }
                 break;
 
@@ -209,9 +212,10 @@ public class Cell : MonoBehaviour
         color.a = 0;
         _subState = CellSubState.None;
         SetFigure(cellFigure, false);
+        int animationVersion = _figureAnimationVersion;
         StartCoroutine(IQueueCoroutineInCell(
              ISubStateFillProcess(null, color, true),
-             IFigureFillProcess(cellFigure, false)
+             IFigureFillProcess(cellFigure, false, animationVersion)
              ));
     } 
     
@@ -222,8 +226,9 @@ public class Cell : MonoBehaviour
         
         _subState = cellSub;
         SetFigure(CellFigure.None, false);
+        int animationVersion = _figureAnimationVersion;
         StartCoroutine(IQueueCoroutineInCell(
-            IFigureFillProcess(CellFigure.None,true),
+            IFigureFillProcess(CellFigure.None, true, animationVersion),
             ISubStateFillProcess(sprite,color,false)
              ));
     }
@@ -293,7 +298,7 @@ public class Cell : MonoBehaviour
         yield break;
     }
 
-    private IEnumerator IFigureFillProcess(CellFigure s, bool reverse)
+    private IEnumerator IFigureFillProcess(CellFigure s, bool reverse, int animationVersion)
     /*
     {        
         if (!reverse)
@@ -321,9 +326,16 @@ public class Cell : MonoBehaviour
 
 
     {
+        if (animationVersion != _figureAnimationVersion) yield break;
         if (!reverse)
             _image.sprite = _themeService.GetSprite(s);
-        else {_figure = s; _image.sprite = _themeService.GetSprite(s); yield break;}
+        else
+        {
+            if (animationVersion != _figureAnimationVersion) yield break;
+            _figure = s;
+            _image.sprite = _themeService.GetSprite(s);
+            yield break;
+        }
         _isFigureCoroutineWork = true;
 
         Vector3 from = reverse ? Vector3.one : Vector3.one * 0.5f;
@@ -333,6 +345,11 @@ public class Cell : MonoBehaviour
 
         while (time < FIGURE_SCALE_DURATION)
         {
+            if (animationVersion != _figureAnimationVersion)
+            {
+                _isFigureCoroutineWork = false;
+                yield break;
+            }
             time += Time.deltaTime;
             float t = Mathf.Clamp01(time / FIGURE_SCALE_DURATION);
 
@@ -343,6 +360,12 @@ public class Cell : MonoBehaviour
         }
 
         _image.rectTransform.localScale = to;
+
+        if (animationVersion != _figureAnimationVersion)
+        {
+            _isFigureCoroutineWork = false;
+            yield break;
+        }
 
         if (reverse)
             _image.sprite = _themeService.GetSprite(s);

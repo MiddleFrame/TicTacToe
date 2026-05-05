@@ -31,6 +31,9 @@ namespace UIPages
         private Slider _playerHpSlider;
 
         [SerializeField]
+        private RectTransform _scoreFlyAnimationLayer;
+
+        [SerializeField]
         private TextMeshProUGUI _playerOneScoreText;
 
         [SerializeField]
@@ -223,14 +226,19 @@ namespace UIPages
         {
             _playerHpSlider.maxValue = firstPlayer;
             _enemyHpSlider.maxValue = secondPlayer;
+            _playerHpSlider.value = _playerHpSlider.maxValue;
+            _enemyHpSlider.value = _enemyHpSlider.maxValue;
         }
 
         public void UpdateScore(int score1Player, int score2Player)
         {
-            _playerOneScoreText.text = score1Player+"/"+ _playerHpSlider.maxValue;
-            _playerHpSlider.value = score1Player;
-            _playerTwoScorText.text = score2Player+"/" + _enemyHpSlider.maxValue;
-            _enemyHpSlider.value = score2Player;
+            float playerRemain = Mathf.Clamp(_playerHpSlider.maxValue - score1Player, 0, _playerHpSlider.maxValue);
+            float enemyRemain = Mathf.Clamp(_enemyHpSlider.maxValue - score2Player, 0, _enemyHpSlider.maxValue);
+
+            _playerOneScoreText.text = $"{playerRemain:0}/{_playerHpSlider.maxValue:0}";
+            _playerHpSlider.value = playerRemain;
+            _playerTwoScorText.text = $"{enemyRemain:0}/{_enemyHpSlider.maxValue:0}";
+            _enemyHpSlider.value = enemyRemain;
         }
 
         public void UpdatePlayerRP(int score1Player, int score2Player)
@@ -424,6 +432,32 @@ namespace UIPages
         public bool GetIsGameOverShowed()
         {
             return _gameOverPanel.gameObject.activeSelf;
+        }
+
+        public Vector3 GetScoreSliderWorldPosition(int sideId)
+        {
+            bool isCurrentDeviceSide = sideId == _playerService.GetCurrentSideOnDevice();
+            Slider targetSlider = isCurrentDeviceSide ? _playerHpSlider : _enemyHpSlider;
+            return targetSlider.transform.position;
+        }
+
+        public RectTransform GetScoreSliderRectTransform(int sideId)
+        {
+            bool isCurrentDeviceSide = sideId == _playerService.GetCurrentSideOnDevice();
+            Slider targetSlider = isCurrentDeviceSide ? _playerHpSlider : _enemyHpSlider;
+            return targetSlider.transform as RectTransform;
+        }
+
+        public RectTransform GetScoreFlyAnimationLayer()
+        {
+            if (_scoreFlyAnimationLayer != null) return _scoreFlyAnimationLayer;
+            RectTransform ownRect = transform as RectTransform;
+            if (ownRect != null) return ownRect;
+
+            Canvas canvas = FindObjectOfType<Canvas>();
+            if (canvas != null) return canvas.transform as RectTransform;
+
+            return null;
         }
     }
 }

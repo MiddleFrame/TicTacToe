@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using UnityEngine;
 
 namespace UIPages.Interfaces
 {
@@ -22,6 +23,8 @@ namespace UIPages.Interfaces
 
         public void SetIsOnlineGame(bool state);
 
-
+        public Vector3 GetScoreSliderWorldPosition(int sideId);
+        public RectTransform GetScoreSliderRectTransform(int sideId);
+        public RectTransform GetScoreFlyAnimationLayer();
     }
 }

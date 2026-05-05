@@ -7,6 +7,7 @@ using Effects;
 using Emotes;
 using Field;
 using FinishLine;
+using FinishLine.Interfaces;
 using GameState;
 using History;
 using ScreenScaler;
@@ -16,6 +17,7 @@ using Players;
 using Players.Interfaces;
 using Score;
 using ScreenScaler.Interfaces;
+using Settings.Interfaces;
 using Theme;
 using TurnTimer;
 using UIPages;
@@ -83,6 +85,8 @@ namespace Installers
             BindNetworkEventService();
             BindEffectController();
             BindFinishLine();
+            BindFinishLineMasterChecker();
+            BindCellClearAnimation();
             BindManaUI();
             BindHistoryFactory();
             BindInGameUI();
@@ -160,6 +164,26 @@ namespace Installers
         private void BindFinishLine()
         {
             Container.BindInterfacesTo<FinishLineManager>().FromInstance(_finishLineManager).AsSingle();
+        }
+
+        private void BindFinishLineMasterChecker()
+        {
+            Container.BindInterfacesAndSelfTo<FinishLineMasterChecker>().AsSingle();
+        }
+
+        private void BindCellClearAnimation()
+        {
+            ISettingsDataService settingsDataService = Container.Resolve<ISettingsDataService>();
+            switch (settingsDataService.GetCellClearAnimationType())
+            {
+                case ISettingsDataService.CellClearAnimationType.FlyingToScore:
+                    Container.Bind<ICellClearAnimationService>().To<FlyingToScoreCellAnimation>().AsSingle();
+                    break;
+                case ISettingsDataService.CellClearAnimationType.FinishLine:
+                default:
+                    Container.Bind<ICellClearAnimationService>().To<FinishLineLineCellAnimation>().AsSingle();
+                    break;
+            }
         }
 
         private void BindEffectController()

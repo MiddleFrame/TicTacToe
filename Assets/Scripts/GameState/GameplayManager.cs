@@ -214,10 +214,7 @@ namespace GameState
                     {
                         Debug.Log("AI TURN START");
                         _figureCount = Mathf.Min(_figureCount + 1, MAX_FIGURE_COUNT);
-                        _aiService.StartBotTurn(_figureCount,
-                            _scoreService.GetScore(_playerService.GetPlayers()[0].SideId),
-                            _scoreService.GetScore(_playerService.GetPlayers()[1].SideId),
-                            () => { SetGameplayState(GameplayState.NewTurn); });
+                        _coroutineService.AddCoroutine(StartBotTurnAfterTurnAnimation());
                     }
                     else
                     {
@@ -335,6 +332,15 @@ namespace GameState
                         _scoreWinnerService.GetCountRoundWin(2));
                     break;
             }
+        }
+
+        private IEnumerator StartBotTurnAfterTurnAnimation()
+        {
+            _aiService.StartBotTurn(_figureCount,
+                _scoreService.GetScore(_playerService.GetPlayers()[0].SideId),
+                _scoreService.GetScore(_playerService.GetPlayers()[1].SideId),
+                () => { SetGameplayState(GameplayState.NewTurn); });
+            yield return null;
         }
 
 
