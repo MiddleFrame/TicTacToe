@@ -15,8 +15,9 @@ namespace FinishLine
     public class FlyingToScoreCellAnimation : ICellClearAnimationService
     {
         private const bool ENABLE_TARGET_TRACE_LOGS = false;
-        private const float ICON_SIZE_FACTOR = 0.72f;
-        private const float SCALE_UP_FACTOR = 1.04f;
+        private const bool ENABLE_SIZE_TRACE_LOGS = false;
+        private const float ICON_SIZE_FACTOR = 1.0f;
+        private const float SCALE_UP_FACTOR = 1.15f;
         private const int START_DELAY_FRAMES = 15;
         private const int SCALE_UP_FRAMES = 18;
         private const int HOLD_AFTER_SCALE_FRAMES = 18; // ~0.5s at 60 FPS
@@ -47,7 +48,7 @@ namespace FinishLine
             _themeService = themeService;
         }
 
-        public float AnimationFrames => 0f;
+        public float AnimationFrames => 3f;
 
         public IEnumerator Play(List<List<Vector2Int>> lines, Action<List<Vector2Int>, int> drawLineAction)
         {
@@ -61,8 +62,23 @@ namespace FinishLine
 
             RectTransform targetRect = _inGameUIService.GetScoreSliderRectTransform(currentPlayer);
             RectTransform animationLayer = ResolveAnimationLayer(targetRect);
+            Canvas animationCanvas = _inGameUIService.GetScoreFlyAnimationCanvas();
+            if (animationCanvas == null && animationLayer != null)
+            {
+                animationCanvas = animationLayer.GetComponentInParent<Canvas>();
+            }
+            Canvas targetCanvas = _inGameUIService.GetScoreSliderCanvas(currentPlayer);
+            if (ENABLE_SIZE_TRACE_LOGS)
+            {
+                Debug.Log(
+                    $"[FlySizeTrace][Env] resolution={Screen.width}x{Screen.height} aspect={(float)Screen.width / Screen.height:F3} " +
+                    $"layer={(animationLayer != null ? animationLayer.name : "null")} " +
+                    $"layerCanvas={(animationCanvas != null ? animationCanvas.name : "null")} " +
+                    $"layerCanvasScale={(animationCanvas != null ? animationCanvas.scaleFactor.ToString("F3") : "n/a")} " +
+                    $"targetRect={(targetRect != null ? targetRect.name : "null")} currentPlayer={currentPlayer}");
+            }
 
-            List<FlyingIconData> icons = SpawnIcons(uniqueCells, animationLayer);
+            List<FlyingIconData> icons = SpawnIcons(uniqueCells, animationLayer, animationCanvas);
             if (icons.Count == 0)
             {
                 ApplyScoreAndClear(uniqueCells, currentPlayer);
@@ -74,7 +90,7 @@ namespace FinishLine
                 _fieldFigureService.SetFigure(uniqueCells[i], CellFigure.None, isQueue: false);
             }
 
-            yield return AnimateIconsToTarget(icons, targetRect, animationLayer, currentPlayer);
+            yield return AnimateIconsToTarget(icons, targetRect, targetCanvas, animationLayer, animationCanvas, currentPlayer);
         }
 
         private static List<Vector2Int> CollectUniqueCells(List<List<Vector2Int>> lines)
@@ -94,7 +110,7 @@ namespace FinishLine
             return uniqueCells;
         }
 
-        private List<FlyingIconData> SpawnIcons(List<Vector2Int> cells, RectTransform layer)
+        private List<FlyingIconData> SpawnIcons(List<Vector2Int> cells, RectTransform layer, Canvas layerCanvas)
         {
             List<FlyingIconData> icons = new();
             if (layer == null) return icons;
@@ -119,10 +135,13 @@ namespace FinishLine
                 iconRect.anchorMax = new Vector2(0.5f, 0.5f);
                 iconRect.pivot = new Vector2(0.5f, 0.5f);
                 iconRect.localScale = Vector3.one;
-                Image sourceFigureImage = cellLink.transform.GetChild(2).GetComponent<Image>();
-                iconRect.sizeDelta = sourceFigureImage != null
-                    ? sourceFigureImage.rectTransform.rect.size
-                    : sourceRect.rect.size;
+                Image sourceFigureImage = cellLink.FigureImage;
+                RectTransform sourceIconRect = sourceFigureImage != null
+                    ? sourceFigureImage.rectTransform
+                    : sourceRect;
+                Canvas sourceCanvas = cellLink.ParentCanvas;
+                Vector2 sizeInLayerByWorldCorners = GetRectSizeInLayerSpace(sourceIconRect, sourceCanvas, layer, layerCanvas);
+                iconRect.sizeDelta = sizeInLayerByWorldCorners;
                 iconRect.sizeDelta *= ICON_SIZE_FACTOR;
                 if (iconRect.sizeDelta.sqrMagnitude <= 0.001f)
                 {
@@ -139,15 +158,36 @@ namespace FinishLine
                 Vector3 sourceWorldPosition = sourceFigureImage != null
                     ? sourceFigureImage.rectTransform.position
                     : sourceRect.position;
-                Vector2 startScreenPosition = GetScreenPointFromRect(sourceWorldPosition, sourceRect);
-                Vector2 layerStartLocal = ConvertWorldToLayerLocal(sourceWorldPosition, sourceRect, layer);
+                Vector2 startScreenPosition = GetScreenPoint(sourceWorldPosition, sourceCanvas);
+                Vector2 layerStartLocal = ConvertWorldToLayerLocal(sourceWorldPosition, sourceCanvas, layer, layerCanvas);
                 iconRect.localPosition = new Vector3(layerStartLocal.x, layerStartLocal.y, 0f);
 
+                if (ENABLE_SIZE_TRACE_LOGS)
+                {
+                    Vector2 sourceRectSize = sourceRect.rect.size;
+                    Vector2 sourceIconRectSize = sourceIconRect.rect.size;
+                    Vector2 sourceWorldSize = GetRectWorldSize(sourceIconRect);
+                    Vector2 sourceScreenSize = GetRectScreenSize(sourceIconRect, sourceCanvas);
+                    Vector2 sourceToLayerByScreen = GetRectSizeInLayerSpaceByScreen(sourceIconRect, sourceCanvas, layer, layerCanvas);
+                    Debug.Log(
+                        $"[FlySizeTrace][Cell] figure={cellFigure} cell={cellId} " +
+                        $"sourceRectSize={sourceRectSize} sourceIconRectSize={sourceIconRectSize} " +
+                        $"sourceWorldSize={sourceWorldSize} sourceScreenSizePx={sourceScreenSize} " +
+                        $"toLayerByWorldCorners={sizeInLayerByWorldCorners} toLayerByScreen={sourceToLayerByScreen} " +
+                        $"finalIconSize={iconRect.sizeDelta} factor={ICON_SIZE_FACTOR:F2} " +
+                        $"sourceCanvas={(sourceCanvas != null ? sourceCanvas.name : "null")} " +
+                        $"sourceCanvasScale={(sourceCanvas != null ? sourceCanvas.scaleFactor.ToString("F3") : "n/a")} " +
+                        $"layerCanvas={(layerCanvas != null ? layerCanvas.name : "null")} " +
+                        $"layerCanvasScale={(layerCanvas != null ? layerCanvas.scaleFactor.ToString("F3") : "n/a")} " +
+                        $"sourceLossyScale={sourceIconRect.lossyScale} layerLossyScale={(layer != null ? layer.lossyScale.ToString() : "n/a")}");
+                }
+
                 RectTransform targetRect = _inGameUIService.GetScoreSliderRectTransform(_playerService.GetCurrentPlayer().SideId);
+                Canvas targetCanvas = _inGameUIService.GetScoreSliderCanvas(_playerService.GetCurrentPlayer().SideId);
                 Vector3 targetWorldPosition = targetRect != null
                     ? targetRect.position
                     : _inGameUIService.GetScoreSliderWorldPosition(_playerService.GetCurrentPlayer().SideId);
-                Vector2 layerTargetLocal = ConvertWorldToLayerLocal(targetWorldPosition, targetRect, layer);
+                Vector2 layerTargetLocal = ConvertWorldToLayerLocal(targetWorldPosition, targetCanvas, layer, layerCanvas);
                 Vector2 toTarget = layerTargetLocal - new Vector2(iconRect.localPosition.x, iconRect.localPosition.y);
                 if (ENABLE_TARGET_TRACE_LOGS)
                 {
@@ -179,13 +219,15 @@ namespace FinishLine
         private IEnumerator AnimateIconsToTarget(
             List<FlyingIconData> icons,
             RectTransform targetRect,
+            Canvas targetCanvas,
             RectTransform layer,
+            Canvas layerCanvas,
             int currentPlayer)
         {
             Vector3 targetWorldPosition = targetRect != null
                 ? targetRect.position
                 : _inGameUIService.GetScoreSliderWorldPosition(currentPlayer);
-            Vector2 layerTarget2D = ConvertWorldToLayerLocal(targetWorldPosition, targetRect, layer);
+            Vector2 layerTarget2D = ConvertWorldToLayerLocal(targetWorldPosition, targetCanvas, layer, layerCanvas);
             Vector3 layerTargetPosition = new Vector3(layerTarget2D.x, layerTarget2D.y, 0f);
             int totalFrames = SCALE_UP_FRAMES + HOLD_AFTER_SCALE_FRAMES + FLY_FRAMES +
                               START_DELAY_FRAMES * Mathf.Max(0, icons.Count - 1);
@@ -267,13 +309,18 @@ namespace FinishLine
 
         private RectTransform ResolveAnimationLayer(RectTransform targetRect)
         {
-            if (targetRect != null)
+            RectTransform configuredLayer = _inGameUIService.GetScoreFlyAnimationLayer();
+            if (configuredLayer != null)
             {
-                Canvas targetCanvas = targetRect.GetComponentInParent<Canvas>();
-                if (targetCanvas != null) return targetCanvas.transform as RectTransform;
+                return configuredLayer;
             }
 
-            return _inGameUIService.GetScoreFlyAnimationLayer();
+            if (targetRect != null)
+            {
+                return targetRect;
+            }
+
+            return null;
         }
 
         private void ApplyScoreAndClear(List<Vector2Int> uniqueCells, int currentPlayer)
@@ -300,9 +347,8 @@ namespace FinishLine
             return 1f + c3 * p * p * p + c1 * p * p;
         }
 
-        private static Vector2 GetScreenPointFromRect(Vector3 worldPoint, RectTransform sourceRect)
+        private static Vector2 GetScreenPoint(Vector3 worldPoint, Canvas sourceCanvas)
         {
-            Canvas sourceCanvas = sourceRect != null ? sourceRect.GetComponentInParent<Canvas>() : null;
             Camera sourceCamera = sourceCanvas != null && sourceCanvas.renderMode != RenderMode.ScreenSpaceOverlay
                 ? sourceCanvas.worldCamera
                 : null;
@@ -311,20 +357,99 @@ namespace FinishLine
 
         private static Vector2 ConvertWorldToLayerLocal(
             Vector3 worldPoint,
-            RectTransform sourceRect,
-            RectTransform layer)
+            Canvas sourceCanvas,
+            RectTransform layer,
+            Canvas layerCanvas)
         {
             if (layer == null) return new Vector2(worldPoint.x, worldPoint.y);
 
-            Vector2 screenPoint = GetScreenPointFromRect(worldPoint, sourceRect);
-
-            Canvas layerCanvas = layer.GetComponentInParent<Canvas>();
+            Vector2 screenPoint = GetScreenPoint(worldPoint, sourceCanvas);
             Camera layerCamera = layerCanvas != null && layerCanvas.renderMode != RenderMode.ScreenSpaceOverlay
                 ? layerCanvas.worldCamera
                 : null;
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(layer, screenPoint, layerCamera, out Vector2 layerLocal);
             return layerLocal;
+        }
+
+        private static Vector2 GetRectSizeInLayerSpace(
+            RectTransform sourceRect,
+            Canvas sourceCanvas,
+            RectTransform layer,
+            Canvas layerCanvas)
+        {
+            if (sourceRect == null) return Vector2.zero;
+            if (layer == null) return sourceRect.rect.size;
+
+            Vector3[] worldCorners = new Vector3[4];
+            sourceRect.GetWorldCorners(worldCorners);
+
+            Vector2 p0 = ConvertWorldToLayerLocal(worldCorners[0], sourceCanvas, layer, layerCanvas);
+            Vector2 p1 = ConvertWorldToLayerLocal(worldCorners[1], sourceCanvas, layer, layerCanvas);
+            Vector2 p3 = ConvertWorldToLayerLocal(worldCorners[3], sourceCanvas, layer, layerCanvas);
+
+            float width = Vector2.Distance(p0, p3);
+            float height = Vector2.Distance(p0, p1);
+
+            return new Vector2(width, height);
+        }
+
+        private static Vector2 GetRectWorldSize(RectTransform sourceRect)
+        {
+            if (sourceRect == null) return Vector2.zero;
+            Vector3[] worldCorners = new Vector3[4];
+            sourceRect.GetWorldCorners(worldCorners);
+            float width = Vector3.Distance(worldCorners[0], worldCorners[3]);
+            float height = Vector3.Distance(worldCorners[0], worldCorners[1]);
+            return new Vector2(width, height);
+        }
+
+        private static Vector2 GetRectScreenSize(RectTransform sourceRect, Canvas sourceCanvas)
+        {
+            if (sourceRect == null) return Vector2.zero;
+            Vector3[] worldCorners = new Vector3[4];
+            sourceRect.GetWorldCorners(worldCorners);
+            Camera sourceCamera = sourceCanvas != null && sourceCanvas.renderMode != RenderMode.ScreenSpaceOverlay
+                ? sourceCanvas.worldCamera
+                : null;
+
+            Vector2 p0 = RectTransformUtility.WorldToScreenPoint(sourceCamera, worldCorners[0]);
+            Vector2 p1 = RectTransformUtility.WorldToScreenPoint(sourceCamera, worldCorners[1]);
+            Vector2 p3 = RectTransformUtility.WorldToScreenPoint(sourceCamera, worldCorners[3]);
+            float width = Vector2.Distance(p0, p3);
+            float height = Vector2.Distance(p0, p1);
+            return new Vector2(width, height);
+        }
+
+        private static Vector2 GetRectSizeInLayerSpaceByScreen(
+            RectTransform sourceRect,
+            Canvas sourceCanvas,
+            RectTransform layer,
+            Canvas layerCanvas)
+        {
+            if (sourceRect == null) return Vector2.zero;
+            if (layer == null) return sourceRect.rect.size;
+
+            Vector3[] worldCorners = new Vector3[4];
+            sourceRect.GetWorldCorners(worldCorners);
+            Camera sourceCamera = sourceCanvas != null && sourceCanvas.renderMode != RenderMode.ScreenSpaceOverlay
+                ? sourceCanvas.worldCamera
+                : null;
+
+            Vector2 s0 = RectTransformUtility.WorldToScreenPoint(sourceCamera, worldCorners[0]);
+            Vector2 s1 = RectTransformUtility.WorldToScreenPoint(sourceCamera, worldCorners[1]);
+            Vector2 s3 = RectTransformUtility.WorldToScreenPoint(sourceCamera, worldCorners[3]);
+
+            Camera layerCamera = layerCanvas != null && layerCanvas.renderMode != RenderMode.ScreenSpaceOverlay
+                ? layerCanvas.worldCamera
+                : null;
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(layer, s0, layerCamera, out Vector2 l0);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(layer, s1, layerCamera, out Vector2 l1);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(layer, s3, layerCamera, out Vector2 l3);
+            float width = Vector2.Distance(l0, l3);
+            float height = Vector2.Distance(l0, l1);
+            return new Vector2(width, height);
         }
 
         private class FlyingIconData

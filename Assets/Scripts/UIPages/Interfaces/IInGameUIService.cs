@@ -25,6 +25,8 @@ namespace UIPages.Interfaces
 
         public Vector3 GetScoreSliderWorldPosition(int sideId);
         public RectTransform GetScoreSliderRectTransform(int sideId);
+        public Canvas GetScoreSliderCanvas(int sideId);
         public RectTransform GetScoreFlyAnimationLayer();
+        public Canvas GetScoreFlyAnimationCanvas();
     }
 }

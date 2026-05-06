@@ -32,6 +32,9 @@ namespace UIPages
 
         [SerializeField]
         private RectTransform _scoreFlyAnimationLayer;
+        
+        [SerializeField]
+        private Canvas _scoreFlyAnimationCanvas;
 
         [SerializeField]
         private TextMeshProUGUI _playerOneScoreText;
@@ -142,6 +145,11 @@ namespace UIPages
         private Action _returnMenuButtonAction;
         private Action _newTurnButtonAction;
         private bool _isOnlineGame;
+        [SerializeField]
+        private Canvas _playerScoreCanvas;
+        
+        [SerializeField]
+        private Canvas _enemyScoreCanvas;
 
         #region Dependecy
 
@@ -172,6 +180,16 @@ namespace UIPages
         }
 
         #endregion
+
+        private void Awake()
+        {
+            _playerScoreCanvas = _playerHpSlider != null ? _playerHpSlider.GetComponentInParent<Canvas>() : null;
+            _enemyScoreCanvas = _enemyHpSlider != null ? _enemyHpSlider.GetComponentInParent<Canvas>() : null;
+            if (_scoreFlyAnimationCanvas == null && _scoreFlyAnimationLayer != null)
+            {
+                _scoreFlyAnimationCanvas = _scoreFlyAnimationLayer.GetComponentInParent<Canvas>();
+            }
+        }
 
         private void UpdateReplyState()
         {
@@ -448,16 +466,21 @@ namespace UIPages
             return targetSlider.transform as RectTransform;
         }
 
+        public Canvas GetScoreSliderCanvas(int sideId)
+        {
+            bool isCurrentDeviceSide = sideId == _playerService.GetCurrentSideOnDevice();
+            return isCurrentDeviceSide ? _playerScoreCanvas : _enemyScoreCanvas;
+        }
+
         public RectTransform GetScoreFlyAnimationLayer()
         {
             if (_scoreFlyAnimationLayer != null) return _scoreFlyAnimationLayer;
-            RectTransform ownRect = transform as RectTransform;
-            if (ownRect != null) return ownRect;
+            return transform as RectTransform;
+        }
 
-            Canvas canvas = FindObjectOfType<Canvas>();
-            if (canvas != null) return canvas.transform as RectTransform;
-
-            return null;
+        public Canvas GetScoreFlyAnimationCanvas()
+        {
+            return _scoreFlyAnimationCanvas;
         }
     }
 }

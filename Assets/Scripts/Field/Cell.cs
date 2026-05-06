@@ -79,17 +79,38 @@ public class Cell : MonoBehaviour
 
     private bool _isCellClear;
 
+    [SerializeField]
     private Image _image;
+    [SerializeField]
     private Image _subImage;
+    [SerializeField]
     private Image _highlightImage;
+    private Canvas _parentCanvas;
 
     void Awake()
     {
         _transformRect = GetComponent<RectTransform>();
-        _subImage = transform.GetChild(0).GetComponent<Image>();
-        _highlightImage = transform.GetChild(1).GetComponent<Image>();
-        _image = transform.GetChild(2).GetComponent<Image>();
+        if (_subImage == null && transform.childCount > 0)
+        {
+            _subImage = transform.GetChild(0).GetComponent<Image>();
+        }
+
+        if (_highlightImage == null && transform.childCount > 1)
+        {
+            _highlightImage = transform.GetChild(1).GetComponent<Image>();
+        }
+
+        if (_image == null && transform.childCount > 2)
+        {
+            _image = transform.GetChild(2).GetComponent<Image>();
+        }
+
+        _parentCanvas = GetComponentInParent<Canvas>();
     }
+
+    public Image FigureImage => _image;
+    public RectTransform FigureRect => _image != null ? _image.rectTransform : null;
+    public Canvas ParentCanvas => _parentCanvas;
 
     public void SetFigure(int s, bool isNeedPlace = true, bool isQueue = true)
     {
