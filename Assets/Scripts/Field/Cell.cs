@@ -129,13 +129,18 @@ public class Cell : MonoBehaviour
             _figure = (CellFigure)s;
         _figureAnimationVersion++;
 
+        if (!isQueue)
+        {
+            ApplyFigureImmediately((CellFigure)s);
+            return;
+        }
+
         switch ((CellFigure)s)
         {
             case CellFigure.None:
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, true, _figureAnimationVersion));
-                    else StartCoroutine(IFigureFillProcess((CellFigure)s, true, _figureAnimationVersion));
+                    _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, true, _figureAnimationVersion));
                 }
                 break;
             case CellFigure.P1:
@@ -143,8 +148,7 @@ public class Cell : MonoBehaviour
                 //_image.fillOrigin = 0; 
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
-                    else StartCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
+                    _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
                 }
                 break;
             case CellFigure.P2:
@@ -152,8 +156,7 @@ public class Cell : MonoBehaviour
                 //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
-                    else StartCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
+                    _coroutineService.AddCoroutine(IFigureFillProcess((CellFigure)s, false, _figureAnimationVersion));
                 }
                 break;
 
@@ -164,13 +167,17 @@ public class Cell : MonoBehaviour
     {
         _figure = s;
         _figureAnimationVersion++;
+        if (!isQueue)
+        {
+            ApplyFigureImmediately(s);
+            return;
+        }
         switch (s)
         {
             case CellFigure.None:
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, true, _figureAnimationVersion));
-                    else StartCoroutine(IFigureFillProcess(s, true, _figureAnimationVersion));
+                    _coroutineService.AddCoroutine(IFigureFillProcess(s, true, _figureAnimationVersion));
                 }
                 break;
             case CellFigure.P1:
@@ -178,8 +185,7 @@ public class Cell : MonoBehaviour
                 //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
-                    else StartCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
+                    _coroutineService.AddCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
                 }
                 break;
             case CellFigure.P2:
@@ -187,13 +193,23 @@ public class Cell : MonoBehaviour
                 //_image.fillOrigin = 0;
                 if (isNeedPlace)
                 {
-                    if (isQueue) _coroutineService.AddCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
-                    else StartCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
+                    _coroutineService.AddCoroutine(IFigureFillProcess(s, false, _figureAnimationVersion));
                 }
                 break;
 
 
         }
+    }
+
+    private void ApplyFigureImmediately(CellFigure figure)
+    {
+        if (_image == null) return;
+        if (figure == CellFigure.P1) _image.fillMethod = Image.FillMethod.Vertical;
+        if (figure == CellFigure.P2) _image.fillMethod = Image.FillMethod.Radial360;
+        _image.rectTransform.localScale = Vector3.one;
+        _image.sprite = _themeService.GetSprite(figure);
+        _figure = figure;
+        _isFigureCoroutineWork = false;
     }
 
     public void SetTransformSize(float reals, bool instantly = true)
@@ -245,10 +261,10 @@ public class Cell : MonoBehaviour
         _subState = CellSubState.None;
         SetFigure(cellFigure, false);
         int animationVersion = _figureAnimationVersion;
-        StartCoroutine(IQueueCoroutineInCell(
-             ISubStateFillProcess(null, color, true),
-             IFigureFillProcess(cellFigure, false, animationVersion)
-             ));
+        _coroutineService.AddCoroutine(IQueueCoroutineInCell(
+            ISubStateFillProcess(null, color, true),
+            IFigureFillProcess(cellFigure, false, animationVersion)
+        ));
     } 
     
     public void ResetFigureWithPlaceState(Sprite sprite,
@@ -259,10 +275,10 @@ public class Cell : MonoBehaviour
         _subState = cellSub;
         SetFigure(CellFigure.None, false);
         int animationVersion = _figureAnimationVersion;
-        StartCoroutine(IQueueCoroutineInCell(
+        _coroutineService.AddCoroutine(IQueueCoroutineInCell(
             IFigureFillProcess(CellFigure.None, true, animationVersion),
             ISubStateFillProcess(sprite,color,false)
-             ));
+        ));
     }
 
     public void HighlightCell(Sprite sprite, Color color)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Coroutine.Interfaces;
@@ -63,15 +63,10 @@ namespace FinishLine
         #endregion
 
 
-        public void MasterChecker(int figure, bool isInQueue = false, bool isNeedEvent = true)
+        public void MasterChecker(int figure, bool isInQueue = true, bool isNeedEvent = true)
         {
-            if (isInQueue)
-            {
-                _coroutineService.AddCoroutine(MasterCheckerCoroutine((CellFigure) figure, isNeedEvent));
-                return;
-            }
-
-            StartCoroutine(MasterCheckerCoroutine((CellFigure) figure, isNeedEvent));
+            _ = isInQueue;
+            _coroutineService.AddCoroutine(MasterCheckerCoroutine((CellFigure) figure, isNeedEvent));
         }
 
         public void SetNetworkEventAction(Action action)

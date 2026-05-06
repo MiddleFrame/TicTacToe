@@ -148,7 +148,7 @@ namespace Effects
                     if (isAwaitNeed)
                     {
                         //Выполняется при переходе на следующий уровень приоритета
-                        StartCoroutine(IEffectAwaitAsync(effectList, maxTime));
+                        _coroutineService.AddCoroutine(IEffectAwaitAsync(effectList, maxTime));
                         yield break;
                     }
 
@@ -163,7 +163,7 @@ namespace Effects
                     }
                     else
                     {
-                        StartCoroutine(IEffectAwaitAsync(effectList,
+                        _coroutineService.AddCoroutine(IEffectAwaitAsync(effectList,
                             Mathf.Max(effect.EffectTimeAction,
                                 (effect.EffectTurnCount == 0) ? effect.EffectTimeDisable : 0)));
                         yield break;
@@ -186,14 +186,13 @@ namespace Effects
             }
 
             yield return _coroutineAwaitService.AwaitTime(maxTime);
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
             _handPoolView.UpdateCardUI();
         }
 
         private IEnumerator IEffectAwaitAsync(List<Effect> effects, float startAwait = 0)
         {
             yield return _coroutineAwaitService.AwaitTime(startAwait);
-            while (!_coroutineService.GetIsQueueEmpty()) yield return null;
             _coroutineService.AddCoroutine(UpdateEffectTurn(effects));
         }
 

@@ -1,5 +1,6 @@
 ﻿using Analytic.Interfaces;
 using Cards.Interfaces;
+using Coroutine.Interfaces;
 using FinishLine.Interfaces;
 using GameScene.Interfaces;
 using GameState.Interfaces;
@@ -28,6 +29,7 @@ namespace ActionInstaller
         private readonly IGameStateService _gameStateService;
         private readonly IGameSceneService _gameSceneService;
         private readonly IFinishLineService _finishLineService;
+        private readonly ICoroutineService _coroutineService;
 
         public GameSceneActionBinder
         (
@@ -42,7 +44,8 @@ namespace ActionInstaller
             INetworkEventService networkEventService,
             IGameStateService gameStateService,
             IGameSceneService gameSceneService,
-            IFinishLineService finishLineService
+            IFinishLineService finishLineService,
+            ICoroutineService coroutineService
         )
         {
             _playerService = playerService;
@@ -57,6 +60,7 @@ namespace ActionInstaller
             _gameStateService = gameStateService;
             _finishLineService = finishLineService;
             _gameSceneService = gameSceneService;
+            _coroutineService = coroutineService;
         }
 
         #endregion
@@ -82,6 +86,7 @@ namespace ActionInstaller
             {
                 if (_gameStateService.GetIsOnline() && _playerService.GetCurrentPlayer().SideId !=
                     _roomService.GetCurrentPlayerSide()) return;
+                if (!_coroutineService.GetIsQueueEmpty()) return;
                 _gameStateService.SetGamePlayStateQueue(GameplayState.NewTurn);
                 _checkEventNetworkService.RaiseEventEndTurn();
             });

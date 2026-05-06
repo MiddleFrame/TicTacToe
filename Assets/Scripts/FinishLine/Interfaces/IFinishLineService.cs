@@ -4,7 +4,7 @@ namespace FinishLine.Interfaces
 {
     public interface IFinishLineService
     {
-        public void MasterChecker(int figure, bool isInQueue = false, bool isNeedEvent = true);
+        public void MasterChecker(int figure, bool isInQueue = true, bool isNeedEvent = true);
 
         public void SetNetworkEventAction(Action action);
         public void SetNewGameState(Action<GameplayState> action);
