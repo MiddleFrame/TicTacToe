@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class TransformExtensions
 {
-    public static IEnumerator ScaleWithLerp(this Transform transform, Vector2 initialScale, Vector2 finalScale,
+    public static IEnumerator ScaleWithLerp(this Transform transform, Vector3 initialScale, Vector3 finalScale,
         int countFrame, Action callBack = null)
     {
         float percentage = 0;
@@ -14,7 +14,7 @@ public static class TransformExtensions
         while (frame <= countFrame)
         {
             percentage = (float) frame / (float) countFrame;
-            transform.localScale = Vector2.Lerp(initialScale, finalScale, percentage);
+            transform.localScale = Vector3.Lerp(initialScale, finalScale, percentage);
             frame += 1;
             yield return null;
         }

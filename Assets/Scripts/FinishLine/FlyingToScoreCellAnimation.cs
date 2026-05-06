@@ -53,21 +53,19 @@ namespace FinishLine
         public IEnumerator Play(List<List<Vector2Int>> lines, Action<List<Vector2Int>, int> drawLineAction)
         {
             _ = drawLineAction;
-            int currentPlayer = _playerService.GetCurrentPlayer().SideId;
             List<Vector2Int> uniqueCells = CollectUniqueCells(lines);
             if (uniqueCells.Count == 0)
             {
                 yield break;
             }
 
+            int currentPlayer = _playerService.GetCurrentPlayer().SideId;
             RectTransform targetRect = _inGameUIService.GetScoreSliderRectTransform(currentPlayer);
             RectTransform animationLayer = ResolveAnimationLayer(targetRect);
             Canvas animationCanvas = _inGameUIService.GetScoreFlyAnimationCanvas();
-            if (animationCanvas == null && animationLayer != null)
-            {
-                animationCanvas = animationLayer.GetComponentInParent<Canvas>();
-            }
+           
             Canvas targetCanvas = _inGameUIService.GetScoreSliderCanvas(currentPlayer);
+           
             if (ENABLE_SIZE_TRACE_LOGS)
             {
                 Debug.Log(
@@ -81,7 +79,7 @@ namespace FinishLine
             List<FlyingIconData> icons = SpawnIcons(uniqueCells, animationLayer, animationCanvas);
             if (icons.Count == 0)
             {
-                ApplyScoreAndClear(uniqueCells, currentPlayer);
+                ApplyScoreAndClear(uniqueCells);
                 yield break;
             }
 
@@ -90,7 +88,7 @@ namespace FinishLine
                 _fieldFigureService.SetFigure(uniqueCells[i], CellFigure.None, isQueue: false);
             }
 
-            yield return AnimateIconsToTarget(icons, targetRect, targetCanvas, animationLayer, animationCanvas, currentPlayer);
+            yield return AnimateIconsToTarget(icons);
         }
 
         private static List<Vector2Int> CollectUniqueCells(List<List<Vector2Int>> lines)
@@ -140,6 +138,10 @@ namespace FinishLine
                     ? sourceFigureImage.rectTransform
                     : sourceRect;
                 Canvas sourceCanvas = cellLink.ParentCanvas;
+                if (sourceCanvas == null)
+                {
+                    sourceCanvas = sourceIconRect.GetComponentInParent<Canvas>();
+                }
                 Vector2 sizeInLayerByWorldCorners = GetRectSizeInLayerSpace(sourceIconRect, sourceCanvas, layer, layerCanvas);
                 iconRect.sizeDelta = sizeInLayerByWorldCorners;
                 iconRect.sizeDelta *= ICON_SIZE_FACTOR;
@@ -182,17 +184,23 @@ namespace FinishLine
                         $"sourceLossyScale={sourceIconRect.lossyScale} layerLossyScale={(layer != null ? layer.lossyScale.ToString() : "n/a")}");
                 }
 
-                RectTransform targetRect = _inGameUIService.GetScoreSliderRectTransform(_playerService.GetCurrentPlayer().SideId);
-                Canvas targetCanvas = _inGameUIService.GetScoreSliderCanvas(_playerService.GetCurrentPlayer().SideId);
+                int scoreSide = ResolveFigureScoreSide(cellFigure);
+                int damageTargetSide = GetOppositeSide(scoreSide);
+                RectTransform targetRect = _inGameUIService.GetScoreSliderRectTransform(damageTargetSide);
+                Canvas targetCanvas = _inGameUIService.GetScoreSliderCanvas(damageTargetSide);
+                if (targetCanvas == null && targetRect != null)
+                {
+                    targetCanvas = targetRect.GetComponentInParent<Canvas>();
+                }
                 Vector3 targetWorldPosition = targetRect != null
                     ? targetRect.position
-                    : _inGameUIService.GetScoreSliderWorldPosition(_playerService.GetCurrentPlayer().SideId);
+                    : _inGameUIService.GetScoreSliderWorldPosition(damageTargetSide);
                 Vector2 layerTargetLocal = ConvertWorldToLayerLocal(targetWorldPosition, targetCanvas, layer, layerCanvas);
                 Vector2 toTarget = layerTargetLocal - new Vector2(iconRect.localPosition.x, iconRect.localPosition.y);
                 if (ENABLE_TARGET_TRACE_LOGS)
                 {
                     Debug.Log(
-                        $"[FlyTargetTrace] figure={cellFigure} cell={cellId} currentPlayer={_playerService.GetCurrentPlayer().SideId} " +
+                        $"[FlyTargetTrace] figure={cellFigure} cell={cellId} scoreSide={scoreSide} damageTargetSide={damageTargetSide} " +
                         $"sourceWorld={sourceWorldPosition} targetWorld={targetWorldPosition} " +
                         $"startLocal={iconRect.localPosition} targetLocal={layerTargetLocal} toTarget={toTarget} " +
                         $"targetRect={(targetRect != null ? targetRect.name : "null")} layer={(layer != null ? layer.name : "null")}");
@@ -207,6 +215,8 @@ namespace FinishLine
                     Image = iconImage,
                     StartPosition = iconRect.localPosition,
                     StartScale = iconRect.localScale,
+                    TargetPosition = new Vector3(layerTargetLocal.x, layerTargetLocal.y, 0f),
+                    ScoreSide = scoreSide,
                     Perpendicular = perpendicular * direction,
                     SineAmplitude = amplitude,
                     StartFrame = i * START_DELAY_FRAMES
@@ -216,19 +226,8 @@ namespace FinishLine
             return icons;
         }
 
-        private IEnumerator AnimateIconsToTarget(
-            List<FlyingIconData> icons,
-            RectTransform targetRect,
-            Canvas targetCanvas,
-            RectTransform layer,
-            Canvas layerCanvas,
-            int currentPlayer)
+        private IEnumerator AnimateIconsToTarget(List<FlyingIconData> icons)
         {
-            Vector3 targetWorldPosition = targetRect != null
-                ? targetRect.position
-                : _inGameUIService.GetScoreSliderWorldPosition(currentPlayer);
-            Vector2 layerTarget2D = ConvertWorldToLayerLocal(targetWorldPosition, targetCanvas, layer, layerCanvas);
-            Vector3 layerTargetPosition = new Vector3(layerTarget2D.x, layerTarget2D.y, 0f);
             int totalFrames = SCALE_UP_FRAMES + HOLD_AFTER_SCALE_FRAMES + FLY_FRAMES +
                               START_DELAY_FRAMES * Mathf.Max(0, icons.Count - 1);
             for (int frame = 0; frame <= totalFrames; frame++)
@@ -264,7 +263,7 @@ namespace FinishLine
                     int flyFrame = localFrame - SCALE_UP_FRAMES - HOLD_AFTER_SCALE_FRAMES;
                     float tFly = Mathf.Clamp01(flyFrame / (float) FLY_FRAMES);
                     float eased = EaseInOutCubic(tFly);
-                    Vector3 basePosition = Vector3.LerpUnclamped(icon.StartPosition, layerTargetPosition, eased);
+                    Vector3 basePosition = Vector3.LerpUnclamped(icon.StartPosition, icon.TargetPosition, eased);
                     float sineOffset = Mathf.Sin(tFly * Mathf.PI * 2f * SINE_WAVES) *
                                        icon.SineAmplitude * (1f - tFly);
                     rect.localPosition = basePosition + (Vector3) (icon.Perpendicular * sineOffset);
@@ -277,7 +276,7 @@ namespace FinishLine
                     {
                         if (!icon.IsScored)
                         {
-                            _scoreService.AddScore(currentPlayer, 1);
+                            _scoreService.AddScore(icon.ScoreSide, 1);
                             _inGameUIService.UpdateScore(_scoreService.GetScore(1), _scoreService.GetScore(2));
                             icon.IsScored = true;
                         }
@@ -295,7 +294,7 @@ namespace FinishLine
                 FlyingIconData icon = icons[i];
                 if (!icon.IsScored)
                 {
-                    _scoreService.AddScore(currentPlayer, 1);
+                    _scoreService.AddScore(icon.ScoreSide, 1);
                     _inGameUIService.UpdateScore(_scoreService.GetScore(1), _scoreService.GetScore(2));
                     icon.IsScored = true;
                 }
@@ -309,23 +308,49 @@ namespace FinishLine
 
         private RectTransform ResolveAnimationLayer(RectTransform targetRect)
         {
+            if (targetRect != null)
+            {
+                Canvas targetCanvas = targetRect.GetComponentInParent<Canvas>();
+                if (targetCanvas != null)
+                {
+                    return targetCanvas.transform as RectTransform;
+                }
+            }
+
             RectTransform configuredLayer = _inGameUIService.GetScoreFlyAnimationLayer();
             if (configuredLayer != null)
             {
                 return configuredLayer;
             }
 
-            if (targetRect != null)
-            {
-                return targetRect;
-            }
-
-            return null;
+            return targetRect;
         }
 
-        private void ApplyScoreAndClear(List<Vector2Int> uniqueCells, int currentPlayer)
+        private int ResolveFigureScoreSide(CellFigure figure)
         {
-            _scoreService.AddScore(currentPlayer, uniqueCells.Count);
+            if (figure == CellFigure.P1) return 1;
+            if (figure == CellFigure.P2) return 2;
+            return _playerService.GetCurrentPlayer().SideId;
+        }
+
+        private static int GetOppositeSide(int side)
+        {
+            return side == 1 ? 2 : 1;
+        }
+
+        private void ApplyScoreAndClear(List<Vector2Int> uniqueCells)
+        {
+            int scoreP1 = 0;
+            int scoreP2 = 0;
+            for (int i = 0; i < uniqueCells.Count; i++)
+            {
+                CellFigure figure = _fieldFigureService.GetCellFigure(uniqueCells[i]);
+                if (figure == CellFigure.P1) scoreP1++;
+                else if (figure == CellFigure.P2) scoreP2++;
+            }
+
+            if (scoreP1 > 0) _scoreService.AddScore(1, scoreP1);
+            if (scoreP2 > 0) _scoreService.AddScore(2, scoreP2);
             _inGameUIService.UpdateScore(_scoreService.GetScore(1), _scoreService.GetScore(2));
 
             for (int i = 0; i < uniqueCells.Count; i++)
@@ -457,6 +482,8 @@ namespace FinishLine
             public Image Image;
             public Vector3 StartPosition;
             public Vector3 StartScale;
+            public Vector3 TargetPosition;
+            public int ScoreSide;
             public Vector2 Perpendicular;
             public float SineAmplitude;
             public int StartFrame;

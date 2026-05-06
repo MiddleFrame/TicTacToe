@@ -109,7 +109,7 @@ namespace Cards
                 }
             }
 
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
             _handPoolManipulator.AddCard(_playerService.GetCurrentPlayer());
         }
 
@@ -124,7 +124,7 @@ namespace Cards
 
                     _fieldFigureService.PlaceInCell(position);
 
-                    _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+                    _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
                 }
             }
         }
@@ -134,7 +134,7 @@ namespace Cards
             for (int i = 0; i < 5; i++)
             {
                 _fieldFigureService.PlaceInRandomCell();
-                _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+                _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
             }
         }
 
@@ -158,7 +158,7 @@ namespace Cards
 
             _manaUIService.UpdateManaUI();
             //_coroutineAwaitService.AddAwaitTime(Cell.AnimationTime);
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
         }
 
         private void Shortage(Vector2Int chosenCell, CardInfo info)
@@ -246,7 +246,7 @@ namespace Cards
         private void FreezeCell(Vector2Int chosenCell, CardInfo info)
         {
             _fieldFigureService.FreezeCell(chosenCell);
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
         }
 
 
@@ -266,7 +266,7 @@ namespace Cards
                 posList.Add(_fieldService.GetCellLink(result));
             }
 
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
         }
 
 
@@ -313,7 +313,7 @@ namespace Cards
 
             _coroutineAwaitService.AddAwaitTime(effect.EffectTimeDisable);
             _checkEventNetworkService.RaiseEventAwaitTime(effect.EffectTimeDisable);
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
         }
 
         private void PlaceAroundFreeze(Vector2Int chosenCell, CardInfo info)
@@ -331,7 +331,7 @@ namespace Cards
                 }
             }
 
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
         }
 
         private void FreezeAllMana(Vector2Int chosenCell, CardInfo info)
@@ -350,7 +350,7 @@ namespace Cards
 
             _manaUIService.UpdateManaUI();
             _coroutineAwaitService.AddAwaitTime(Cell.AnimationTime);
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
         }
 
         private void ManaPerIce(Vector2Int chosenCell, CardInfo info)
@@ -372,7 +372,7 @@ namespace Cards
                 _freezeEffectService.ReleaseFreeze(cell);
             }
 
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
         }
         
         private void IceEncirclement(Vector2Int chosenCell, CardInfo info)
@@ -383,7 +383,7 @@ namespace Cards
                 _fieldFigureService.FreezeCell(cell.Id);
             }
             _coroutineAwaitService.AddAwaitTime(Cell.AnimationTime);
-            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+            _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
         }
 
         #endregion

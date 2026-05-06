@@ -110,7 +110,18 @@ public class Cell : MonoBehaviour
 
     public Image FigureImage => _image;
     public RectTransform FigureRect => _image != null ? _image.rectTransform : null;
-    public Canvas ParentCanvas => _parentCanvas;
+    public Canvas ParentCanvas
+    {
+        get
+        {
+            if (_parentCanvas == null)
+            {
+                _parentCanvas = GetComponentInParent<Canvas>();
+            }
+
+            return _parentCanvas;
+        }
+    }
 
     public void SetFigure(int s, bool isNeedPlace = true, bool isQueue = true)
     {

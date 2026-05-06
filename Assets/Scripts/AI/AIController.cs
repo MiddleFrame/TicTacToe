@@ -148,7 +148,8 @@ namespace AI
                     Debug.LogFormat("Current tactic : {0}. Is Empty: {1}", _botAggression,
                         _coroutineService.GetIsQueueEmpty());
                     _historyService.AddHistoryCard(_playerService.GetCurrentPlayer(), _botCardDefault);
-                    _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId);
+                    // For bot turns, run checker via shared queue so AI waits for full clear animation.
+                    _finishLineService.MasterChecker(_playerService.GetCurrentPlayer().SideId, isInQueue: true);
                     while (!_coroutineService.GetIsQueueEmpty()) yield return null;
                     
                 }

@@ -247,7 +247,6 @@ namespace Cards.CustomType
             {
                 if (_isPositionCoroutineWork) StopCoroutine(_positionCoroutine);
                 _isPositionCoroutineWork = true;
-                Debug.Log($"Set new position init {_cardTransformRect.localPosition} fin {position}");
                 _positionCoroutine = StartCoroutine(_cardTransformRect.LocalPositionWithLerp
                     (
                         _cardTransformRect.localPosition,

@@ -181,15 +181,7 @@ namespace UIPages
 
         #endregion
 
-        private void Awake()
-        {
-            _playerScoreCanvas = _playerHpSlider != null ? _playerHpSlider.GetComponentInParent<Canvas>() : null;
-            _enemyScoreCanvas = _enemyHpSlider != null ? _enemyHpSlider.GetComponentInParent<Canvas>() : null;
-            if (_scoreFlyAnimationCanvas == null && _scoreFlyAnimationLayer != null)
-            {
-                _scoreFlyAnimationCanvas = _scoreFlyAnimationLayer.GetComponentInParent<Canvas>();
-            }
-        }
+
 
         private void UpdateReplyState()
         {
@@ -250,8 +242,13 @@ namespace UIPages
 
         public void UpdateScore(int score1Player, int score2Player)
         {
-            float playerRemain = Mathf.Clamp(_playerHpSlider.maxValue - score1Player, 0, _playerHpSlider.maxValue);
-            float enemyRemain = Mathf.Clamp(_enemyHpSlider.maxValue - score2Player, 0, _enemyHpSlider.maxValue);
+            int currentSide = _playerService.GetCurrentSideOnDevice();
+            int ownScore = currentSide == 1 ? score1Player : score2Player;
+            int enemyScore = currentSide == 1 ? score2Player : score1Player;
+
+            // Score means "damage dealt by side", sliders show remaining HP.
+            float playerRemain = Mathf.Clamp(_playerHpSlider.maxValue - enemyScore, 0, _playerHpSlider.maxValue);
+            float enemyRemain = Mathf.Clamp(_enemyHpSlider.maxValue - ownScore, 0, _enemyHpSlider.maxValue);
 
             _playerOneScoreText.text = $"{playerRemain:0}/{_playerHpSlider.maxValue:0}";
             _playerHpSlider.value = playerRemain;
@@ -418,19 +415,19 @@ namespace UIPages
             if (_scoreWinnerService.GetRoundWinner() == 1)
             {
                 currentPoint = _p1RoundOverPoints[p1Count - 1].transform;
-                currentPoint.localScale = Vector2.zero;
+                currentPoint.localScale = Vector3.zero;
             }
             else if (_scoreWinnerService.GetRoundWinner() == 2)
             {
                 currentPoint = _p2RoundOverPoints[p2Count - 1].transform;
-                currentPoint.localScale = Vector2.zero;
+                currentPoint.localScale = Vector3.zero;
             }
 
 
             yield return _coroutineAwaitService.AwaitTime((_roundOverPanel.FrameCount));
             yield return new WaitForSeconds(0.5f);
             if (currentPoint != null)
-                yield return StartCoroutine(currentPoint.ScaleWithLerp(Vector2.zero, Vector2.one, 20));
+                yield return StartCoroutine(currentPoint.ScaleWithLerp(Vector3.zero, Vector3.one, 20));
             yield return new WaitForSeconds(1f);
             _roundOverPanel.FadeOut();
             yield return _coroutineAwaitService.AwaitTime((_roundOverPanel.FrameCount));
@@ -474,8 +471,7 @@ namespace UIPages
 
         public RectTransform GetScoreFlyAnimationLayer()
         {
-            if (_scoreFlyAnimationLayer != null) return _scoreFlyAnimationLayer;
-            return transform as RectTransform;
+            return _scoreFlyAnimationLayer;
         }
 
         public Canvas GetScoreFlyAnimationCanvas()
