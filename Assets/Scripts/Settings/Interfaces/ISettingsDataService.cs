@@ -11,6 +11,10 @@
         public void SetCellClearAnimationType(int animationType);
         public void LoadCellClearAnimationType();
         public ISettingsDataService.CellClearAnimationType GetCellClearAnimationType();
+
+        public void SetDevModeState(bool isEnabled);
+        public void LoadDevModeState();
+        public bool GetIsDevModeEnabled();
         
         public enum Language
         {

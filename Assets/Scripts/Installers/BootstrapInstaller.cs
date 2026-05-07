@@ -3,6 +3,7 @@ using CardCollection;
 using Cards;
 using Coin;
 using Coroutine;
+using DevMode;
 using GameScene;
 using GameTypeService;
 using IAPurchasing;
@@ -33,6 +34,7 @@ public class BootstrapInstaller : MonoInstaller, IInitializable
         BindIAPurchase();
         BindCoroutineQueue();
         BindLanguage();
+        BindDevMode();
         BindCollectionData();
     }
 
@@ -44,6 +46,11 @@ public class BootstrapInstaller : MonoInstaller, IInitializable
     private void BindLanguage()
     {
         Container.BindInterfacesAndSelfTo<SettingsDataHolder>().AsSingle();
+    }
+
+    private void BindDevMode()
+    {
+        Container.BindInterfacesAndSelfTo<DevModeService>().AsSingle();
     }
 
     private void BindCoroutineQueue()
@@ -108,6 +115,7 @@ public class BootstrapInstaller : MonoInstaller, IInitializable
         Container.Resolve<IVibrationService>().Init();
         Container.Resolve<ISettingsDataService>().LoadLanguage();
         Container.Resolve<ISettingsDataService>().LoadCellClearAnimationType();
+        Container.Resolve<ISettingsDataService>().LoadDevModeState();
 #if UNITY_IAP
         Container.Resolve<IIAPService>().IAPInitializate();
 #endif

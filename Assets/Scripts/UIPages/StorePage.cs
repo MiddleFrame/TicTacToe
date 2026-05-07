@@ -3,6 +3,7 @@ using Analytic.Interfaces;
 using Cards.Interfaces;
 using Coin.Interfaces;
 using IAPurchasing.Interfaces;
+using SaveSystem;
 using TMPro;
 using UIElements;
 using UnityEngine;
@@ -12,6 +13,9 @@ namespace UIPages
 {
     public class StorePage : MonoBehaviour
     {
+        private const string WARNING_POPUP_KEY = "IsWarningPopupShowed";
+        private const string STORE_SAVE_PATH = "StoreData";
+
         [Header("Store properties"), SerializeField]
         private AnimationFading _warningPopup;
 
@@ -48,10 +52,39 @@ namespace UIPages
             _randomCardPrice.text = _coinService.GetCoinPerUnlock().ToString();
         }
 
+        private static BinarySaveSystem _storeSaveSystem;
+        private static StoreSaveData _storeSaveData;
+
+        private static void EnsureStoreDataLoaded()
+        {
+            _storeSaveSystem ??= new BinarySaveSystem(STORE_SAVE_PATH);
+            if (_storeSaveData != null) return;
+
+            _storeSaveData = (StoreSaveData) _storeSaveSystem.Load();
+            if (_storeSaveData != null) return;
+
+            _storeSaveData = new StoreSaveData
+            {
+                IsWarningPopupShowed = PlayerPrefs.GetInt(WARNING_POPUP_KEY, 0) == 1
+            };
+
+            if (PlayerPrefs.HasKey(WARNING_POPUP_KEY)) PlayerPrefs.DeleteKey(WARNING_POPUP_KEY);
+            _storeSaveSystem.Save(_storeSaveData);
+        }
+
         private bool _isWarningPopupShowed
         {
-            get => PlayerPrefs.GetInt("IsWarningPopupShowed", 0) == 1;
-            set => PlayerPrefs.SetInt("IsWarningPopupShowed", value ? 1 : 0);
+            get
+            {
+                EnsureStoreDataLoaded();
+                return _storeSaveData.IsWarningPopupShowed;
+            }
+            set
+            {
+                EnsureStoreDataLoaded();
+                _storeSaveData.IsWarningPopupShowed = value;
+                _storeSaveSystem.Save(_storeSaveData);
+            }
         }
 
         public void ShowWarningPopup()

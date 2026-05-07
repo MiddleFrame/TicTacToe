@@ -1,6 +1,7 @@
 ﻿using Analytic.Interfaces;
 using Cards.Interfaces;
 using Coin.Interfaces;
+using DevMode.Interfaces;
 using GameScene;
 using GameScene.Interfaces;
 using GameTypeService.Enums;
@@ -35,6 +36,15 @@ namespace UIPages
         [Header("Settings properties"), SerializeField]
         private TMP_Dropdown _cellClearAnimationDropdown;
 
+        [Header("Dev mode properties"), SerializeField]
+        private Button _enableDevModeButton;
+
+        [SerializeField]
+        private Button _disableDevModeButton;
+
+        [SerializeField]
+        private DevModePasswordPopup _devModePasswordPopup;
+
         private static bool _isConnectedToMasterState = false;
 
         #region Dependency
@@ -46,13 +56,15 @@ namespace UIPages
         private IGameTypeService _gameTypeService;
         private ITutorialCompleteService _tutorialCompleteService;
         private ISettingsDataService _settingsDataService;
+        private IDevModeService _devModeService;
 
         [Inject]
         private void Construct(ICardList cardList, ICoinService coinService,
             IMatchEventsAnalyticService matchEventsAnalyticService, IGameSceneService gameSceneService,
             IGameTypeService gameTypeService,
             ITutorialCompleteService tutorialCompleteService,
-            ISettingsDataService settingsDataService)
+            ISettingsDataService settingsDataService,
+            IDevModeService devModeService)
         {
             _cardList = cardList;
             _coinService = coinService;
@@ -61,9 +73,16 @@ namespace UIPages
             _gameTypeService = gameTypeService;
             _tutorialCompleteService = tutorialCompleteService;
             _settingsDataService = settingsDataService;
+            _devModeService = devModeService;
         }
 
         #endregion
+
+        private void Awake()
+        {
+            if (_devModePasswordPopup == null) return;
+            _devModePasswordPopup.PasswordSubmitted += OnDevModePasswordSubmitted;
+        }
 
         private void Start()
         {
@@ -72,12 +91,26 @@ namespace UIPages
             _tutorialShowedArea.SetActive(_tutorialCompleteService.GetIsTutorialComplete());
             _tutorialNotShowedArea.SetActive(!_tutorialCompleteService.GetIsTutorialComplete());
             SyncCellClearAnimationDropdown();
+            SyncDevModeButtons();
         }
 
         private void OnEnable()
         {
+            _devModeService.DevModeStateChanged += OnDevModeStateChanged;
             UpdateTexts();
             SyncCellClearAnimationDropdown();
+            SyncDevModeButtons();
+        }
+
+        private void OnDisable()
+        {
+            _devModeService.DevModeStateChanged -= OnDevModeStateChanged;
+        }
+
+        private void OnDestroy()
+        {
+            if (_devModePasswordPopup == null) return;
+            _devModePasswordPopup.PasswordSubmitted -= OnDevModePasswordSubmitted;
         }
 
         public void UpdateTexts()
@@ -160,6 +193,41 @@ namespace UIPages
         {
             if (_cellClearAnimationDropdown == null) return;
             _cellClearAnimationDropdown.SetValueWithoutNotify(GetCellClearAnimationType());
+        }
+
+        public void EnableDevModeButtonClick()
+        {
+            if (_devModePasswordPopup == null) return;
+            _devModePasswordPopup.Open();
+        }
+
+        public void DisableDevModeButtonClick()
+        {
+            _devModeService.DisableDevMode();
+        }
+
+        public void SyncDevModeButtons()
+        {
+            bool isDevModeEnabled = _devModeService.GetIsDevModeEnabled();
+            if (_enableDevModeButton != null) _enableDevModeButton.gameObject.SetActive(!isDevModeEnabled);
+            if (_disableDevModeButton != null) _disableDevModeButton.gameObject.SetActive(isDevModeEnabled);
+        }
+
+        private void OnDevModePasswordSubmitted(string password)
+        {
+            if (_devModeService.TryEnableDevMode(password))
+            {
+                _devModePasswordPopup.Close();
+            }
+            else
+            {
+                _devModePasswordPopup.ShowInvalidPassword();
+            }
+        }
+
+        private void OnDevModeStateChanged(bool isEnabled)
+        {
+            SyncDevModeButtons();
         }
     }
 }

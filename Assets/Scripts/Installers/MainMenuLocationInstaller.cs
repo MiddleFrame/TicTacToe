@@ -1,6 +1,6 @@
-﻿using System;
-using CardCollection;
+﻿using CardCollection;
 using Cards;
+using DevMode;
 using Network;
 using UIElements;
 using UIPages;
@@ -28,8 +28,14 @@ namespace Installers
             BindMasterConnector();
             BindMainMenuUI();
             BindCollectionManager();
+            BindCollectionDevMode();
             BindCollectionFactory();
             BindBuyingAnimation();
+        }
+
+        private void BindCollectionDevMode()
+        {
+            Container.BindInterfacesAndSelfTo<DevCollectionService>().AsSingle();
         }
 
         private void BindBuyingAnimation()

@@ -7,6 +7,7 @@ namespace Cards.Interfaces
         public void UnlockRandomCard(bool isNeedUsekCoin = true);
 
         public void UnlockAllCard();
+        public void LockAllCard();
 
         public bool IsCardUnlock(CardInfo cardInfo);
     }

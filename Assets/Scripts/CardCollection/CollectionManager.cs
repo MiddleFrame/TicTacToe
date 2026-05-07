@@ -219,11 +219,34 @@ namespace CardCollection
             {
                 _buyingAnimationController.ShowBuyingAnimation(_collectionData.GetCardFromId(keyList[i].Key));
                 _cardBoolUnlockData.BoolData[keyList[i].Key] = true;
-                _currentDeckData.List.Add(keyList[i].Key);
+                if (!_currentDeckData.List.Contains(keyList[i].Key))
+                {
+                    _currentDeckData.List.Add(keyList[i].Key);
+                }
             }
 
             SaveCurrentDeckData();
             SaveCardUnlockData();
+            CreateCardPull();
+            UpdateCollectionCardState();
+            UpdateDeckCardState();
+        }
+
+        public void LockAllCard()
+        {
+            foreach (int cardId in _cardBoolUnlockData.BoolData.Keys.ToList())
+            {
+                _cardBoolUnlockData.BoolData[cardId] = false;
+            }
+
+            _currentDeckData.List.Clear();
+            _redactedDeck = _currentDeckData.List;
+
+            SaveCurrentDeckData();
+            SaveCardUnlockData();
+            CreateCardPull();
+            UpdateCollectionCardState();
+            UpdateDeckCardState();
         }
 
         private void LoadCardUnlockData()

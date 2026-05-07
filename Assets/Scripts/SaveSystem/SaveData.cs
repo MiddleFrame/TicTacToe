@@ -22,6 +22,32 @@ public class CardListData : ISaveble
     public List<int> List = new();
 }
 
+[Serializable]
+public class SettingsSaveData : ISaveble
+{
+    public string Language;
+    public int CellClearAnimationType;
+    public bool IsDevModeEnabled;
+}
+
+[Serializable]
+public class CoinSaveData : ISaveble
+{
+    public int CurrentMoney;
+}
+
+[Serializable]
+public class TutorialSaveData : ISaveble
+{
+    public bool IsTutorialShowed;
+}
+
+[Serializable]
+public class StoreSaveData : ISaveble
+{
+    public bool IsWarningPopupShowed;
+}
+
 public interface ISaveble
 {
 }
