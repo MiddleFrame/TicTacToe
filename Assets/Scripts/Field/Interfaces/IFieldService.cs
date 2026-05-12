@@ -23,5 +23,7 @@ namespace Field.Interfaces
         
         public Cell GetCellLink(Vector2Int id);
         public Cell GetCellLink(int x,int y);
+        public void SetFieldDragHighlightState(bool state);
+        public void UpdateFieldDragHighlight();
     }
 }

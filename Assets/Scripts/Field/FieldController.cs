@@ -11,6 +11,7 @@ using Players.Interfaces;
 using ScreenScaler.Interfaces;
 using Theme.Interfaces;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace Field
@@ -19,12 +20,26 @@ namespace Field
     {
         [SerializeField]
         private bool _isNeedGizmos;
+        [SerializeField]
+        private bool _isNeedFieldBoundsDebug;
+        [SerializeField]
+        private bool _isNeedFieldHighlightDebug;
+        private int _lastFieldBoundsDebugFrame = -1;
+        private bool? _lastHeightDebugState;
 
         [Space, Space, Space, Space, Header("Parent properties"), SerializeField]
         private GameObject _lineParent;
 
         [SerializeField]
         private GameObject _cellParent;
+
+        [Space, Header("Drag highlight"), SerializeField]
+        private Image _fieldDragHighlightImage;
+        [SerializeField]
+        private float _fieldHighlightFadeDuration = 0.25f;
+        private UnityEngine.Coroutine _fieldHighlightFadeCoroutine;
+        private bool _fieldHighlightTargetState;
+        private const float FIELD_HIGHLIGHT_TARGET_ALPHA = 128f / 255f;
 #if UNITY_EDITOR
         [SerializeField]
         private Camera Camera;
@@ -125,6 +140,7 @@ namespace Field
             InitializeField();
             InitializeLine();
             NewCellSize(_fieldSize, false);
+            SetFieldDragHighlightState(false);
         }
 
         private void GetStartPosition()
@@ -433,6 +449,8 @@ namespace Field
                         instantly);
                 _lineListHorizontal[i].SetPositions(points[0], points[1], instantly);
             }
+
+            UpdateFieldDragHighlight();
         }
 
 
@@ -491,6 +509,93 @@ namespace Field
                    pos.y >= (_startPositionY + _remainY) & pos.y <= (_endPositionY - _remainY);
         }
 
+        public void SetFieldDragHighlightState(bool state)
+        {
+            if (_fieldDragHighlightImage == null) return;
+            if (_fieldHighlightTargetState == state &&
+                (_fieldHighlightFadeCoroutine != null || _fieldDragHighlightImage.gameObject.activeSelf == state))
+            {
+                return;
+            }
+
+            _fieldHighlightTargetState = state;
+            if (!state && !_fieldDragHighlightImage.gameObject.activeSelf) return;
+
+            if (state && !_fieldDragHighlightImage.gameObject.activeSelf)
+            {
+                Color color = _fieldDragHighlightImage.color;
+                color.a = 0f;
+                _fieldDragHighlightImage.color = color;
+                _fieldDragHighlightImage.gameObject.SetActive(true);
+            }
+
+            if (_fieldHighlightFadeCoroutine != null) StopCoroutine(_fieldHighlightFadeCoroutine);
+            float targetAlpha = state ? FIELD_HIGHLIGHT_TARGET_ALPHA : 0f;
+            _fieldHighlightFadeCoroutine = StartCoroutine(_fieldDragHighlightImage.AlphaWithLerpByDuration(
+                _fieldDragHighlightImage.color.a,
+                targetAlpha,
+                _fieldHighlightFadeDuration,
+                true,
+                () =>
+                {
+                    if (!state) _fieldDragHighlightImage.gameObject.SetActive(false);
+                    _fieldHighlightFadeCoroutine = null;
+                }));
+            if (_isNeedFieldHighlightDebug)
+            {
+                Debug.Log($"[FieldHighlight] active={state}");
+            }
+        }
+
+        public void UpdateFieldDragHighlight()
+        {
+            if (_fieldDragHighlightImage == null) return;
+
+            RectTransform highlightRect = _fieldDragHighlightImage.rectTransform;
+            RectTransform parentRect = highlightRect.parent as RectTransform;
+            float minX = _startPositionX;
+            float maxX = _endPositionX;
+            float minY = _startPositionY + _remainY;
+            float maxY = _endPositionY - _remainY;
+            Vector2 minScreen = new Vector2(minX, minY);
+            Vector2 maxScreen = new Vector2(maxX, maxY);
+
+            if (parentRect == null)
+            {
+                highlightRect.position = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
+                highlightRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxX - minX);
+                highlightRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, maxY - minY);
+                return;
+            }
+
+            Canvas highlightCanvas = _fieldDragHighlightImage.canvas;
+            Camera uiCamera = null;
+            if (highlightCanvas != null && highlightCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            {
+                uiCamera = highlightCanvas.worldCamera;
+            }
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, minScreen, uiCamera, out var minLocal);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, maxScreen, uiCamera, out var maxLocal);
+
+            Vector2 centerLocal = (minLocal + maxLocal) * 0.5f;
+            Vector2 sizeLocal = maxLocal - minLocal;
+            sizeLocal = new Vector2(Mathf.Abs(sizeLocal.x), Mathf.Abs(sizeLocal.y));
+
+            highlightRect.anchorMin = new Vector2(0.5f, 0.5f);
+            highlightRect.anchorMax = new Vector2(0.5f, 0.5f);
+            highlightRect.pivot = new Vector2(0.5f, 0.5f);
+            highlightRect.anchoredPosition = centerLocal;
+            highlightRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, sizeLocal.x);
+            highlightRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, sizeLocal.y);
+
+            if (_isNeedFieldHighlightDebug)
+            {
+                Debug.Log(
+                    $"[FieldHighlight] boundsScreen min={minScreen} max={maxScreen}; local min={minLocal} max={maxLocal}; centerLocal={centerLocal}; sizeLocal={sizeLocal}; parent={parentRect.name}; canvas={(highlightCanvas != null ? highlightCanvas.name : "null")}; scale={parentRect.lossyScale}");
+            }
+        }
+
         public List<Cell> GetAllCellWithFigure(CellFigure figure)
         {
             List<Cell> result = new List<Cell>();
@@ -515,7 +620,17 @@ namespace Field
 
         public bool IsInFieldHeight(float h)
         {
-            return h >= (_startPositionY + _remainY);
+            float minY = _startPositionY + _remainY;
+            float maxY = _endPositionY - _remainY;
+            bool state = h >= minY;
+            if (_isNeedFieldBoundsDebug && _lastFieldBoundsDebugFrame != Time.frameCount && _lastHeightDebugState != state)
+            {
+                _lastFieldBoundsDebugFrame = Time.frameCount;
+                _lastHeightDebugState = state;
+                Debug.Log($"[FieldBounds] y={h}; minY={minY}; maxY={maxY}; inHeight={state}");
+            }
+
+            return state;
         }
 
         public List<Cell> GetAllEmptyNeighbours(Cell cell)

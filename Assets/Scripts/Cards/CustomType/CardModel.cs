@@ -30,6 +30,9 @@ namespace Cards.CustomType
         private bool _lastAlphaState = true;
         private bool _isSlotsReUpdatePositions;
         private float _heightCard;
+        [SerializeField]
+        private bool _isNeedOnFieldDragDebug;
+        private bool _lastOnFieldCanPlayState;
         #region Dependency
 
         private IPlayerService _playerService;
@@ -82,6 +85,7 @@ namespace Cards.CustomType
         {
             _cardView.SetCanvasOverrideSorting(true);
             _cardView.SetTransformScale(1, false);
+            _fieldService.SetFieldDragHighlightState(false);
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 _parentRect,
@@ -103,6 +107,7 @@ namespace Cards.CustomType
             _chosenCell = new Vector2Int(-1, -1);
             SetTransformRotation(0);
             _isSlotsReUpdatePositions = false;
+            _lastOnFieldCanPlayState = false;
             _stopWatch.Reset();
             _stopWatch.Start();
             if (Info.IsNeedShowTip)
@@ -141,7 +146,8 @@ namespace Cards.CustomType
             _cardRect.localPosition = localPoint + _fingerOffset;
 
 
-            if (_fieldService.IsInFieldHeight(vectorFigure.y) && !_isSlotsReUpdatePositions)
+            bool isInFieldHeight = _fieldService.IsInFieldHeight(vectorFigure.y);
+            if (isInFieldHeight && !_isSlotsReUpdatePositions)
             {
                 _isSlotsReUpdatePositions = true;
                 _handPoolView.UpdateCardPosition(false, this);
@@ -149,9 +155,22 @@ namespace Cards.CustomType
                 Debug.Log("Entered");
             }
 
-            if (Info.CardType == CardTypeImpact.OnField) return;
+            if (Info.CardType == CardTypeImpact.OnField)
+            {
+                Vector2 clearPosition = GetClearPosition();
+                bool canPlayOnReleaseByPosition = _fieldService.IsInFieldHeight(clearPosition.y);
+                _fieldService.SetFieldDragHighlightState(canPlayOnReleaseByPosition);
+                if (_isNeedOnFieldDragDebug && _lastOnFieldCanPlayState != canPlayOnReleaseByPosition)
+                {
+                    Debug.Log(
+                        $"[OnFieldDrag] canPlay={canPlayOnReleaseByPosition}; clearY={clearPosition.y}; centerY={vectorFigure.y}; mouse={Input.mousePosition}");
+                }
 
-            if (_fieldService.IsInFieldHeight(vectorFigure.y))
+                _lastOnFieldCanPlayState = canPlayOnReleaseByPosition;
+                return;
+            }
+
+            if (isInFieldHeight)
             {
                 _cardView.HideTip(true);
             }
@@ -194,6 +213,7 @@ namespace Cards.CustomType
         /// </summary>
         public void EndDragged()
         {
+            _fieldService.SetFieldDragHighlightState(false);
             if (_chosenCell != new Vector2Int(-1, -1))
             {
                 _fieldZoneService.UnhighlightZone(_chosenCell, Info.CardAreaSize);
@@ -222,6 +242,7 @@ namespace Cards.CustomType
 
         public void CancelDragging()
         {
+            _fieldService.SetFieldDragHighlightState(false);
             if (FindObjectOfType<Field.FieldController>() != null)
             {
                 if (_chosenCell != new Vector2Int(-1, -1))
