@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -123,7 +123,8 @@ namespace CardCollection
                 var resourcesCard = Resources.LoadAll<CardInfo>(CARD_INFO_PATH);
                 foreach (var card in resourcesCard)
                 {
-                    _collectionData.AddCard(card);
+                    if(card.isEnabled)
+                        _collectionData.AddCard(card);
                 }
             }
 

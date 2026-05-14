@@ -26,6 +26,7 @@ MonoBehaviour:
   CardAreaSize: {x: 1, y: 1}
   CardCount: 1
   IsNeedShowTip: 0
+  isEnabled: 0
   TipText: 
   CardManacost: 2
   CardBonusManacost: 0

@@ -1,4 +1,4 @@
-using Cards.Enum;
+﻿using Cards.Enum;
 using UnityEngine;
 
 namespace Cards.CustomType
@@ -32,6 +32,7 @@ namespace Cards.CustomType
         public int CardCount;
 
         public bool IsNeedShowTip;
+        public bool isEnabled = true;
         public string TipText;
 
         [Range(0, 5)]
