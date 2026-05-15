@@ -1,11 +1,10 @@
 fileFormatVersion: 2
-<<<<<<<< Updated upstream:Assets/Plugins/Zenject/Source/Usage/link.xml.meta
 guid: 78cde942f7000eb41900aa4d3c9249d7
 TextScriptImporter:
-========
-guid: 55adf59294229194da8098d64bf1bba7
-NativeFormatImporter:
->>>>>>>> Stashed changes:Assets/Animators/MainMenu.controller.meta
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
   externalObjects: {}
   mainObjectFileID: 9100000
   userData: 

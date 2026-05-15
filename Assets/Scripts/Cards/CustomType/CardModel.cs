@@ -183,7 +183,6 @@ namespace Cards.CustomType
                  _lastAlphaState = !_lastAlphaState;
                  SetGroupAlpha(_lastAlphaState ? 1 : 0, false);
              }*/
-
             _chosenCell = _fieldService.GetIdFromPosition(vectorFigure+new Vector2(0, _heightCard), false);
 
             if (_prevChosenCell != _chosenCell)

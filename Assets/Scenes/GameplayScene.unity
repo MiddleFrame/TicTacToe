@@ -7118,6 +7118,8 @@ MonoBehaviour:
   _lineParent: {fileID: 1310581818}
   _cellParent: {fileID: 1997239705}
   _fieldDragHighlightImage: {fileID: 1460056405}
+  _fieldHighlightFadeDuration: 0.25
+  _fieldHighlightPadding: 25
   Camera: {fileID: 519420031}
   _screenBorderX: {x: 50, y: 50}
   _screenBorderY: {x: 750, y: 250}
@@ -12441,7 +12443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.25, g: 0.69663715, b: 1, a: 0.5019608}
+  m_Color: {r: 0.49411765, g: 0.75686276, b: 1, a: 0.3019608}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -12457,7 +12459,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 2.05
 --- !u!222 &1460056406
 CanvasRenderer:
   m_ObjectHideFlags: 0

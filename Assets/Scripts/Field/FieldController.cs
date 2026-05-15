@@ -37,6 +37,8 @@ namespace Field
         private Image _fieldDragHighlightImage;
         [SerializeField]
         private float _fieldHighlightFadeDuration = 0.25f;
+        [SerializeField]
+        private float _fieldHighlightPadding = 2f;
         private UnityEngine.Coroutine _fieldHighlightFadeCoroutine;
         private bool _fieldHighlightTargetState;
         private const float FIELD_HIGHLIGHT_TARGET_ALPHA = 128f / 255f;
@@ -553,10 +555,53 @@ namespace Field
 
             RectTransform highlightRect = _fieldDragHighlightImage.rectTransform;
             RectTransform parentRect = highlightRect.parent as RectTransform;
-            float minX = _startPositionX;
-            float maxX = _endPositionX;
-            float minY = _startPositionY + _remainY;
-            float maxY = _endPositionY - _remainY;
+
+            float centerX;
+            float centerY;
+            float width;
+            float height;
+
+            bool hasHorizontalLine = _lineListHorizontal.Count > 0;
+            bool hasVerticalLine = _lineListVertical.Count > 0;
+            bool hasCells = _cellList.Count > 0 && _cellList[0].Count > 0;
+
+            if (hasHorizontalLine && hasVerticalLine)
+            {
+                Line horizontalLine = _lineListHorizontal[0];
+                Line verticalLine = _lineListVertical[0];
+
+                centerX = (horizontalLine.StartPoint.x + horizontalLine.EndPoint.x) * 0.5f;
+                centerY = (verticalLine.StartPoint.y + verticalLine.EndPoint.y) * 0.5f;
+                width = Mathf.Abs(horizontalLine.EndPoint.x - horizontalLine.StartPoint.x) + _fieldHighlightPadding;
+                height = Mathf.Abs(verticalLine.EndPoint.y - verticalLine.StartPoint.y) + _fieldHighlightPadding;
+            }
+            else if (hasCells)
+            {
+                Vector2 firstCell = _cellList[0][0].Position;
+                Vector2 lastCell = _cellList[^1][^1].Position;
+
+                centerX = (firstCell.x + lastCell.x) * 0.5f;
+                centerY = (firstCell.y + lastCell.y) * 0.5f;
+                width = _cellSize * _fieldSize.x + _fieldHighlightPadding;
+                height = _cellSize * _fieldSize.y + _fieldHighlightPadding;
+            }
+            else
+            {
+                float minXFallback = _startPositionX + _remainX;
+                float maxXFallback = _endPositionX - _remainX;
+                float minYFallback = _startPositionY + _remainY;
+                float maxYFallback = _endPositionY - _remainY;
+
+                centerX = (minXFallback + maxXFallback) * 0.5f;
+                centerY = (minYFallback + maxYFallback) * 0.5f;
+                width = (maxXFallback - minXFallback) + _fieldHighlightPadding;
+                height = (maxYFallback - minYFallback) + _fieldHighlightPadding;
+            }
+
+            float minX = centerX - width * 0.5f;
+            float maxX = centerX + width * 0.5f;
+            float minY = centerY - height * 0.5f;
+            float maxY = centerY + height * 0.5f;
             Vector2 minScreen = new Vector2(minX, minY);
             Vector2 maxScreen = new Vector2(maxX, maxY);
 
@@ -883,7 +928,10 @@ namespace Field
         {
             if (IsCellEnableToPlace(id))
             {
-                SetFigure(id, (CellFigure) _playerService.GetCurrentPlayer().SideId, isQueue: isQueue);
+                bool instantlyIfNoQueue = isQueue;
+                _cellList[id.x][id.y].SetFigure((CellFigure) _playerService.GetCurrentPlayer().SideId,
+                    isQueue: isQueue,
+                    instantlyIfNoQueue: instantlyIfNoQueue);
                 if (isNeedEvent) _figureEventNetworkService.RaiseEventPlaceInCell(id);
             }
         }
@@ -988,7 +1036,6 @@ namespace Field
         private IEnumerator IPlaceInRandomCell()
         {
             Vector2Int id = _aiService.GenerateRandomPosition(_fieldSize);
-            Debug.Log(id);
             if (id != new Vector2Int(-1, -1))
             {
                 PlaceInCell(id, isQueue: false);

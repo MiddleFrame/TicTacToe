@@ -123,7 +123,7 @@ public class Cell : MonoBehaviour
         }
     }
 
-    public void SetFigure(int s, bool isNeedPlace = true, bool isQueue = true)
+    public void SetFigure(int s, bool isNeedPlace = true, bool isQueue = true, bool instantlyIfNoQueue = true)
     {
         if (!isNeedPlace)
             _figure = (CellFigure)s;
@@ -131,7 +131,23 @@ public class Cell : MonoBehaviour
 
         if (!isQueue)
         {
-            ApplyFigureImmediately((CellFigure)s);
+            if (instantlyIfNoQueue || !isNeedPlace)
+            {
+                ApplyFigureImmediately((CellFigure)s);
+            }
+            else
+            {
+                switch ((CellFigure)s)
+                {
+                    case CellFigure.P1:
+                        _image.fillMethod = Image.FillMethod.Vertical;
+                        break;
+                    case CellFigure.P2:
+                        _image.fillMethod = Image.FillMethod.Radial360;
+                        break;
+                }
+                StartCoroutine(IFigureFillProcess((CellFigure)s, (CellFigure)s == CellFigure.None, _figureAnimationVersion));
+            }
             return;
         }
 
@@ -163,13 +179,29 @@ public class Cell : MonoBehaviour
         }
     }
 
-    public void SetFigure(CellFigure s, bool isNeedPlace = true, bool isQueue = true)
+    public void SetFigure(CellFigure s, bool isNeedPlace = true, bool isQueue = true, bool instantlyIfNoQueue = true)
     {
         _figure = s;
         _figureAnimationVersion++;
         if (!isQueue)
         {
-            ApplyFigureImmediately(s);
+            if (instantlyIfNoQueue || !isNeedPlace)
+            {
+                ApplyFigureImmediately(s);
+            }
+            else
+            {
+                switch (s)
+                {
+                    case CellFigure.P1:
+                        _image.fillMethod = Image.FillMethod.Vertical;
+                        break;
+                    case CellFigure.P2:
+                        _image.fillMethod = Image.FillMethod.Radial360;
+                        break;
+                }
+                StartCoroutine(IFigureFillProcess(s, s == CellFigure.None, _figureAnimationVersion));
+            }
             return;
         }
         switch (s)

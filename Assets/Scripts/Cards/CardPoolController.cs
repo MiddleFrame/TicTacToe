@@ -161,9 +161,13 @@ namespace Cards
                 float x = startX + step * i;
 
                 float curveStrength = 0.4f;
-                float posY = positionY +
-                             Mathf.Sin(Mathf.PI * i / ((count==1?0:count) - 1)) *
-                             _heightDelta * curveStrength;
+                float curveOffset = 0f;
+                if (count > 1)
+                {
+                    curveOffset = Mathf.Sin(Mathf.PI * i / (count - 1f)) * _heightDelta * curveStrength;
+                }
+
+                float posY = positionY + curveOffset;
 
 
                 Vector2 finalPos = new Vector2(x, posY);
@@ -174,7 +178,15 @@ namespace Cards
                 card.SetSibling(i);
                 card.SetTransformPosition(finalPos, instantly);
 
-                float angle = _angleDelta - (_angleDelta * 2f / ((count == 1 ? 0 : count) - 1)) * i;
+                float angle;
+                if (count <= 1)
+                {
+                    angle = 0f;
+                }
+                else
+                {
+                    angle = _angleDelta - (_angleDelta * 2f / (count - 1f)) * i;
+                }
                 card.SetTransformRotation(angle, instantly);
             }
         }

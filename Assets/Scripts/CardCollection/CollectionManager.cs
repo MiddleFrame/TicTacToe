@@ -138,6 +138,7 @@ namespace CardCollection
             LoadCardUnlockData();
 
             LoadCurrentDeckData();
+            SynchronizeSavedCollectionData();
 
             _redactedDeck = _currentDeckData.List;
 
@@ -182,9 +183,28 @@ namespace CardCollection
         {
             _cardList.CardListClear();
 
-            foreach (int card in _currentDeckData.List)
+            var cardsById = _collectionData
+                .GetCardList()
+                .ToDictionary(card => card.CardId, card => card);
+
+            bool hasInvalidDeckCards = false;
+            for (int i = _currentDeckData.List.Count - 1; i >= 0; i--)
             {
-                _cardList.CardListAdd(_collectionData.GetCardFromId(card));
+                int cardId = _currentDeckData.List[i];
+                if (!cardsById.TryGetValue(cardId, out CardInfo cardInfo))
+                {
+                    hasInvalidDeckCards = true;
+                    _currentDeckData.List.RemoveAt(i);
+                    continue;
+                }
+
+                _cardList.CardListAdd(cardInfo);
+            }
+
+            if (hasInvalidDeckCards)
+            {
+                SaveCurrentDeckData();
+                Debug.LogWarning("Deck data had invalid card ids and was auto-corrected.");
             }
         }
 
@@ -297,6 +317,42 @@ namespace CardCollection
             SaveCurrentDeckData();
         }
 
+        private void SynchronizeSavedCollectionData()
+        {
+            var cards = _collectionData.GetCardList();
+            var cardsById = cards.ToDictionary(card => card.CardId, card => card);
+
+            bool unlockDataChanged = false;
+            foreach (int cardId in _cardBoolUnlockData.BoolData.Keys.ToList())
+            {
+                if (cardsById.ContainsKey(cardId))
+                    continue;
+
+                _cardBoolUnlockData.BoolData.Remove(cardId);
+                unlockDataChanged = true;
+            }
+
+            foreach (CardInfo card in cards)
+            {
+                if (_cardBoolUnlockData.BoolData.ContainsKey(card.CardId))
+                    continue;
+
+                _cardBoolUnlockData.BoolData[card.CardId] = card.IsDefaultUnlock;
+                unlockDataChanged = true;
+            }
+
+            if (unlockDataChanged)
+                SaveCardUnlockData();
+
+            int removedDeckCards = _currentDeckData.List.RemoveAll(cardId =>
+                !cardsById.ContainsKey(cardId) ||
+                !_cardBoolUnlockData.BoolData.TryGetValue(cardId, out bool isUnlocked) ||
+                !isUnlocked);
+
+            if (removedDeckCards > 0)
+                SaveCurrentDeckData();
+        }
+
         private void SaveCurrentDeckData()
         {
             _currentDeckSaveSystem ??= new BinarySaveSystem(CARD_DECK_PATH);
@@ -305,7 +361,7 @@ namespace CardCollection
 
         public bool IsCardUnlock(CardInfo cardInfo)
         {
-            return _cardBoolUnlockData.BoolData[cardInfo.CardId];
+            return _cardBoolUnlockData.BoolData.TryGetValue(cardInfo.CardId, out bool isUnlocked) && isUnlocked;
         }
 
         private void PickCard(CardInfo card)
