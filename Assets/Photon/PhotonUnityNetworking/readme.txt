@@ -1,4 +1,4 @@
-
+ï»¿
 Photon Unity Networking (PUN)
     This package includes the Photon Unity Networking Api, the Realtime Api (on which PUN is based) and other optional Photon APIs.
     Also included: A setup wizard, demo scenes, documentation and Editor extensions.
@@ -49,13 +49,13 @@ Server
 
 PUN+ Subscriptions
     Follow these steps when you bought an asset that includes a Photon Cloud subscription:
-        • Sign in and open the Dashboard.                       https://dashboard.photonengine.com
+        ï¿½ Sign in and open the Dashboard.                       https://dashboard.photonengine.com
           Use an existing Photon Cloud Account or register.
-        • Select the Application/Subscription to upgrade and click "Add Coupon / PUN+".
-        • Enter your Unity Invoice Number.
+        ï¿½ Select the Application/Subscription to upgrade and click "Add Coupon / PUN+".
+        ï¿½ Enter your Unity Invoice Number.
 
-        • Find the App ID on: https://dashboard.photonengine.com
-        • Find your Unity Invoice Number in the Unity AssetStore:
+        ï¿½ Find the App ID on: https://dashboard.photonengine.com
+        ï¿½ Find your Unity Invoice Number in the Unity AssetStore:
             https://www.assetstore.unity3d.com/en/#!/account/transactions
             Or while logged in to the Asset Store, click on your name on the top right.
             From the drop-down select the payment method you used in your purchase.

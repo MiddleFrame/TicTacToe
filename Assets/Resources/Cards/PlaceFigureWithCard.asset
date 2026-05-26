@@ -20,12 +20,13 @@ MonoBehaviour:
   CardHighlightColor: {r: 0, g: 0, b: 0, a: 0.14901961}
   CardName: Place Figure With Card
   CardDescription: Card/PlaceFigureWithCard
-  IsDefaultUnlock: 0
+  IsDefaultUnlock: 1
   CardType: 2
   CardBonus: 1
   CardAreaSize: {x: 1, y: 1}
   CardCount: 1
   IsNeedShowTip: 0
+  isEnabled: 1
   TipText: 
   CardManacost: 1
   CardBonusManacost: 0
