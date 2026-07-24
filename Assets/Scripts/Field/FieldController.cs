@@ -13,6 +13,7 @@ using Theme.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using Roguelike.Interfaces;
 
 namespace Field
 {
@@ -102,13 +103,15 @@ namespace Field
         private IFieldFactoryService _fieldFactoryService;
         private ISerializableEffects _serializableEffects;
         private IEffectEventNetworkService _effectEventNetworkService;
+        private IRoguelikeRunService _roguelikeRunService;
 
         [Inject]
         public void Construct(IScreenScaler screenScaler, ICoroutineService coroutineService,
             ICoroutineAwaitService coroutineAwaitService, IAreaService areaService, IPlayerService playerService,
             IFigureEventNetworkService figureEventNetworkService, IFreezeEventNetworkService freezeEventNetworkService,
             IThemeService themeService, IAIService aiService, IFieldFactoryService fieldFactoryService,
-            ISerializableEffects serializableEffects,  IEffectEventNetworkService effectEventNetworkService)
+            ISerializableEffects serializableEffects, IEffectEventNetworkService effectEventNetworkService,
+            IRoguelikeRunService roguelikeRunService)
         {
             _screenScaler = screenScaler;
             _coroutineService = coroutineService;
@@ -122,6 +125,7 @@ namespace Field
             _fieldFactoryService = fieldFactoryService;
             _serializableEffects = serializableEffects;
             _effectEventNetworkService = effectEventNetworkService;
+            _roguelikeRunService = roguelikeRunService;
         }
 
         #endregion
@@ -134,10 +138,15 @@ namespace Field
 
         public void Initialization(int round = 0)
         {
+            int size = _startFieldSize + round * GROW_PER_ROUND;
+            InitializationWithSize(size);
+        }
+
+        public void InitializationWithSize(int size)
+        {
             StopAllCoroutines();
             Debug.Log($"_screenScaler {_screenScaler.GetScreenDefault()}");
-            int size = _startFieldSize + round * GROW_PER_ROUND;
-
+            size = Mathf.Max(3, size);
             _fieldSize = new Vector2Int(size, size);
             InitializeField();
             InitializeLine();
@@ -932,6 +941,11 @@ namespace Field
                 _cellList[id.x][id.y].SetFigure((CellFigure) _playerService.GetCurrentPlayer().SideId,
                     isQueue: isQueue,
                     instantlyIfNoQueue: instantlyIfNoQueue);
+                if (_roguelikeRunService.IsRunActive &&
+                    _playerService.GetCurrentPlayer().EntityType == PlayerType.Human)
+                {
+                    _roguelikeRunService.RegisterPlayerFigurePlaced();
+                }
                 if (isNeedEvent) _figureEventNetworkService.RaiseEventPlaceInCell(id);
             }
         }

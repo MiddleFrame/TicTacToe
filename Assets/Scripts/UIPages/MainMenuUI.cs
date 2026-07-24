@@ -7,6 +7,7 @@ using GameScene.Interfaces;
 using GameTypeService.Enums;
 using GameTypeService.Interfaces;
 using Settings.Interfaces;
+using Roguelike.Interfaces;
 using TMPro;
 using Tutorial.Interfaces;
 using UIPages.Interfaces;
@@ -57,6 +58,7 @@ namespace UIPages
         private ITutorialCompleteService _tutorialCompleteService;
         private ISettingsDataService _settingsDataService;
         private IDevModeService _devModeService;
+        private IRoguelikeRunService _roguelikeRunService;
 
         [Inject]
         private void Construct(ICardList cardList, ICoinService coinService,
@@ -64,7 +66,8 @@ namespace UIPages
             IGameTypeService gameTypeService,
             ITutorialCompleteService tutorialCompleteService,
             ISettingsDataService settingsDataService,
-            IDevModeService devModeService)
+            IDevModeService devModeService,
+            IRoguelikeRunService roguelikeRunService)
         {
             _cardList = cardList;
             _coinService = coinService;
@@ -74,6 +77,7 @@ namespace UIPages
             _tutorialCompleteService = tutorialCompleteService;
             _settingsDataService = settingsDataService;
             _devModeService = devModeService;
+            _roguelikeRunService = roguelikeRunService;
         }
 
         #endregion
@@ -120,6 +124,7 @@ namespace UIPages
 
         public void OnAIButtonStart()
         {
+            _roguelikeRunService.EndRun();
             _matchEventsAnalyticService.Player_Start_Match(GameType.SingleAI, _cardList.GetCardList());
             _gameTypeService.SetGameType(GameType.SingleAI);
             _gameSceneService.LoadGameScene(GameSceneManager.GameScene.Game);
@@ -128,8 +133,17 @@ namespace UIPages
 
         public void OnHumanButtonStart()
         {
+            _roguelikeRunService.EndRun();
             _matchEventsAnalyticService.Player_Start_Match(GameType.SingleHuman, _cardList.GetCardList());
             _gameTypeService.SetGameType(GameType.SingleHuman);
+            _gameSceneService.LoadGameScene(GameSceneManager.GameScene.Game);
+        }
+
+        public void OnRoguelikeButtonStart()
+        {
+            _roguelikeRunService.StartNewRun();
+            if (!_roguelikeRunService.IsRunActive) return;
+            _gameTypeService.SetGameType(GameType.Roguelike);
             _gameSceneService.LoadGameScene(GameSceneManager.GameScene.Game);
         }
 

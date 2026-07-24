@@ -1,3 +1,4 @@
+using System;
 using Cards.CustomType;
 using Cards.Interfaces;
 using UIElements;
@@ -32,9 +33,13 @@ namespace CardCollection
         #region Dependency
 
         private ICollectionUIService _collectionUIService;
-        
+
+        private bool _isRoguelikeView;
+        private int _roguelikeDeckIndex;
+        private Action<int> _roguelikeClickAction;
+
        [Inject]
-        private void Construct(ICollectionUIService collectionUIService)
+        private void Construct([InjectOptional] ICollectionUIService collectionUIService)
         {
             _collectionUIService = collectionUIService;
         }
@@ -43,7 +48,21 @@ namespace CardCollection
         
         private void Awake()
         {
-            if (Info == null) Destroy(this.gameObject);
+            if (Info != null) UpdateUI(true);
+        }
+
+        public void BindRoguelike(CardInfo info, int deckIndex, Action<int> clickAction, float visualScale)
+        {
+            Info = info;
+            _roguelikeDeckIndex = deckIndex;
+            _roguelikeClickAction = clickAction;
+            _isRoguelikeView = true;
+            float safeScale = Mathf.Max(0.01f, visualScale);
+            Vector3 cardScale = new(safeScale, safeScale, 1f);
+            _cardObj.transform.localScale = cardScale;
+            _cardObjClose.transform.localScale = cardScale;
+            UpdateUI(true);
+            SetDeckState(true);
         }
 
         public void UpdateUI(bool isUnlock)
@@ -64,18 +83,25 @@ namespace CardCollection
     
         public void OnDrag(PointerEventData eventData)
         {
-            _collectionUIService.OnDrag(eventData);
+            if (_isRoguelikeView) return;
+            _collectionUIService?.OnDrag(eventData);
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            _collectionUIService.StartTap(this,eventData);
+            if (_isRoguelikeView) return;
+            _collectionUIService?.StartTap(this,eventData);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            
-            _collectionUIService.EndTap(this,eventData);
+            if (_isRoguelikeView)
+            {
+                _roguelikeClickAction?.Invoke(_roguelikeDeckIndex);
+                return;
+            }
+
+            _collectionUIService?.EndTap(this,eventData);
         }
     }
 }

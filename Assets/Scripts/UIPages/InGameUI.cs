@@ -295,6 +295,7 @@ namespace UIPages
                             isWin = currentWinner == _roomService.GetCurrentPlayerSide();
                             break;
                         case GameType.SingleAI:
+                        case GameType.Roguelike:
                             isWin = _playerService.GetPlayers()[currentWinner - 1].EntityType == PlayerType.Human;
                             break;
                         case GameType.SingleHuman:
@@ -372,6 +373,7 @@ namespace UIPages
                         isWin = currentWinner == _roomService.GetCurrentPlayerSide();
                         break;
                     case GameType.SingleAI:
+                    case GameType.Roguelike:
                         isWin = _playerService.GetPlayers()[currentWinner - 1].EntityType == PlayerType.Human;
                         break;
                     case GameType.SingleHuman:

@@ -9,6 +9,8 @@ using History.Interfaces;
 using Players.Interfaces;
 using UnityEngine;
 using Zenject;
+using Roguelike;
+using Roguelike.Interfaces;
 using Random = UnityEngine.Random;
 
 namespace AI
@@ -27,6 +29,7 @@ namespace AI
         private IFieldService _fieldService;
         private IFieldFigureService _fieldFigureService;
         private ICoroutineService _coroutineService;
+        private IRoguelikeRunService _roguelikeRunService;
 
 
         [Inject]
@@ -36,7 +39,8 @@ namespace AI
             IFinishLineService finishLineService,
             IFieldService fieldService,
             IFieldFigureService fieldFigureService,
-            ICoroutineService coroutineService)
+            ICoroutineService coroutineService,
+            IRoguelikeRunService roguelikeRunService)
         {
             _playerService = playerService;
             _historyService = historyService;
@@ -44,6 +48,7 @@ namespace AI
             _fieldService = fieldService;
             _fieldFigureService = fieldFigureService;
             _coroutineService = coroutineService;
+            _roguelikeRunService = roguelikeRunService;
         }
 
         #endregion
@@ -132,17 +137,28 @@ namespace AI
 
         public void StartBotTurn(int countFigure, int playerScore, int botScore, Action callback)
         {
-            StartCoroutine(IBotTurnProcess(countFigure,playerScore, botScore,callback));
+            StartCoroutine(IBotTurnProcess(
+                new RoguelikeEnemyTurn { SmartFigures = countFigure },
+                playerScore, botScore, callback));
         }
 
-        private IEnumerator IBotTurnProcess(int countFigure, int playerScore, int botScore, Action callback)
+        public void StartBotTurn(RoguelikeEnemyTurn turn, int playerScore, int botScore, Action callback)
         {
-            for (int i = 0; i < countFigure; i++)
+            StartCoroutine(IBotTurnProcess(turn, playerScore, botScore, callback));
+        }
+
+        private IEnumerator IBotTurnProcess(RoguelikeEnemyTurn turn, int playerScore, int botScore, Action callback)
+        {
+            for (int i = 0; i < turn.TotalFigures; i++)
             {
-                Vector2Int position = GenerateNewTurn(_playerService.GetCurrentPlayer().SideId, playerScore,botScore);
+                bool useSmartMove = i < turn.SmartFigures;
+                Vector2Int position = useSmartMove
+                    ? GenerateNewTurn(_playerService.GetCurrentPlayer().SideId, playerScore, botScore)
+                    : GenerateRandomPosition(_fieldService.GetFieldSize());
                 if (position != new Vector2Int(-1, -1))
                 {
                     _fieldFigureService.PlaceInCell(position);
+                    if (_roguelikeRunService.IsRunActive) _roguelikeRunService.RegisterEnemyFigurePlaced();
                     Debug.Log($"Cell placing on {position}");
 
                     Debug.LogFormat("Current tactic : {0}. Is Empty: {1}", _botAggression,

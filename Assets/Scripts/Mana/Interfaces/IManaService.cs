@@ -12,6 +12,7 @@
         public void RestoreMana(int value);
         public void ResetMana(int round = 0);
         public void IncreaseMaxMana(int mana);
+        public void SetMaximumMana(int mana);
         
     }
 }

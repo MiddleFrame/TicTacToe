@@ -6,6 +6,8 @@
 
         SingleHuman,
 
-        MultiplayerHuman
+        MultiplayerHuman,
+
+        Roguelike
     }
 }

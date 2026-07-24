@@ -9,6 +9,7 @@ namespace Field.Interfaces
         public bool IsExistEmptyCell();
         
         public void Initialization(int round = 0);
+        public void InitializationWithSize(int size);
         public bool CheckIsInField(Vector2 pos);
         public bool IsInFieldHeight(float h);
         public List<Cell> GetAllEmptyNeighbours(Cell cell);

@@ -78,6 +78,11 @@ namespace Cards.CustomType
             _cardView.UpdateUI(ci, playerSide, false);
         }
 
+        public void SetCardInfoWithoutVisualUpdate(CardInfo ci)
+        {
+            Info = ci;
+        }
+
         /// <summary>
         /// Начало перетягивания карты
         /// </summary>

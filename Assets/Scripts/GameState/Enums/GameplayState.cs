@@ -12,5 +12,9 @@
 
     RoundOver,
 
-    NewRound
+    NewRound,
+
+    RoguelikeReward,
+
+    RoguelikeGameOver
 }

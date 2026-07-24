@@ -9,5 +9,6 @@
         public void ClearAllScore();
         public void AddPlayer(int player);
         public void RemovePlayer(int player);
+        public void SetMaxScore(int player, int value);
     }
 }

@@ -23,7 +23,7 @@ namespace Players
                 FullDeckPool = deck
             };
 
-            player.DeckPool = player.FullDeckPool;
+            player.DeckPool = new List<CardModel>(player.FullDeckPool);
             player.HandPool = new List<CardModel>();
             _players.Add(player);
         }
@@ -36,7 +36,7 @@ namespace Players
                 SideId = side,
                 FullDeckPool = deck
             };
-            player.DeckPool = player.FullDeckPool;
+            player.DeckPool = new List<CardModel>(player.FullDeckPool);
             player.HandPool = new List<CardModel>();
             _players.Add(player);
         }

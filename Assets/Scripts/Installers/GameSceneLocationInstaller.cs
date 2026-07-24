@@ -23,6 +23,7 @@ using TurnTimer;
 using UIPages;
 using UnityEngine;
 using Zenject;
+using Roguelike;
 
 namespace Installers
 {
@@ -99,6 +100,12 @@ namespace Installers
             BindFinishLineFactory();
             BindHistoryView();
             BindEmoteManager();
+            BindRoguelikeUI();
+        }
+
+        private void BindRoguelikeUI()
+        {
+            Container.BindInterfacesTo<RoguelikeUIController>().FromComponentInHierarchy().AsSingle();
         }
 
         private void BindEmoteManager()

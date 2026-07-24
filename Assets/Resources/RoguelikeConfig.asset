@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 441f887768df4737815db5ee0857ebf0, type: 3}
+  m_Name: RoguelikeConfig
+  m_EditorClassIdentifier: 
+  _defaultCard: {fileID: 11400000, guid: 310a322169383864694ea01034ec4f33, type: 2}
+  _deckSize: 10
+  _rewardChoiceCount: 3
+  _maximumMana: 6
+  _stages:
+  - BoardSize: 3
+    ScoreToWin: 3
+    EnemyTurn:
+      SmartFigures: 1
+      RandomFigures: 0
+  - BoardSize: 3
+    ScoreToWin: 10
+    EnemyTurn:
+      SmartFigures: 2
+      RandomFigures: 0
+  - BoardSize: 4
+    ScoreToWin: 10
+    EnemyTurn:
+      SmartFigures: 0
+      RandomFigures: 3
+  - BoardSize: 4
+    ScoreToWin: 15
+    EnemyTurn:
+      SmartFigures: 2
+      RandomFigures: 1
+  - BoardSize: 5
+    ScoreToWin: 20
+    EnemyTurn:
+      SmartFigures: 0
+      RandomFigures: 4
+  - BoardSize: 5
+    ScoreToWin: 20
+    EnemyTurn:
+      SmartFigures: 4
+      RandomFigures: 0
+  - BoardSize: 6
+    ScoreToWin: 20
+    EnemyTurn:
+      SmartFigures: 0
+      RandomFigures: 5
+  _smartCycleEnemy:
+    SmartFigures: 4
+    RandomFigures: 0
+  _randomCycleEnemy:
+    SmartFigures: 0
+    RandomFigures: 5

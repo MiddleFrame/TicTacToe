@@ -276,6 +276,27 @@ namespace Cards
             return list;
         }
 
+        public void SynchronizeDeck(PlayerInfo player, IReadOnlyList<CardInfo> cardInfos)
+        {
+            if (player == null || cardInfos == null) return;
+
+            ResetHandPool(player);
+            if (player.FullDeckPool.Count != cardInfos.Count)
+            {
+                Debug.LogError(
+                    $"Cannot synchronize deck: models={player.FullDeckPool.Count}, cards={cardInfos.Count}.");
+                return;
+            }
+
+            for (int i = 0; i < player.FullDeckPool.Count; i++)
+            {
+                player.FullDeckPool[i].SetCardInfoWithoutVisualUpdate(cardInfos[i]);
+                player.FullDeckPool[i].Info.CardBonusManacost = 0;
+            }
+
+            player.DeckPool = new List<CardModel>(player.FullDeckPool);
+        }
+
         public void ResetRechanger()
         {
             if (_cardRechangerBTN.interactable) return;

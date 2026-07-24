@@ -14,6 +14,7 @@ using History.Interfaces;
 using Mana.Interfaces;
 using Network.Interfaces;
 using Players.Interfaces;
+using Roguelike.Interfaces;
 using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
@@ -47,6 +48,7 @@ namespace Cards
         private IFieldZoneService _fieldZoneService;
         private IHistoryService _historyService;
         private IFreezeEffectService _freezeEffectService;
+        private IRoguelikeRunService _roguelikeRunService;
 
         [Inject]
         private void Construct(IAreaService areaService,
@@ -69,7 +71,8 @@ namespace Cards
             IHandPoolView handPoolView,
             IFieldZoneService fieldZoneService,
             IHistoryService historyService,
-            IFreezeEffectService freezeEffectService
+            IFreezeEffectService freezeEffectService,
+            IRoguelikeRunService roguelikeRunService
         )
         {
             _areaService = areaService;
@@ -93,6 +96,7 @@ namespace Cards
             _cardEventNetworkService = cardEventNetworkService;
             _historyService = historyService;
             _freezeEffectService = freezeEffectService;
+            _roguelikeRunService = roguelikeRunService;
         }
 
         #endregion
@@ -424,6 +428,10 @@ namespace Cards
                 _manaUIService.UpdateManaUI();
 
                 _serializableActions[cardModel.Info.СardActionId]?.Invoke(chosenCell, cardModel.Info);
+                if (_roguelikeRunService.IsRunActive)
+                {
+                    _roguelikeRunService.RegisterCardPlayed();
+                }
                 _cardEventNetworkService.RaiseEventCardInvoke(cardModel.Info);
                 _historyService.AddHistoryCard(_playerService.GetCurrentPlayer(), cardModel.Info);
 

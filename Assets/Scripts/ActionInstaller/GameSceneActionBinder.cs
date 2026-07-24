@@ -10,6 +10,7 @@ using Players.Interfaces;
 using Score.Interfaces;
 using UIPages.Interfaces;
 using Zenject;
+using Roguelike.Interfaces;
 
 namespace ActionInstaller
 {
@@ -30,6 +31,7 @@ namespace ActionInstaller
         private readonly IGameSceneService _gameSceneService;
         private readonly IFinishLineService _finishLineService;
         private readonly ICoroutineService _coroutineService;
+        private readonly IRoguelikeRunService _roguelikeRunService;
 
         public GameSceneActionBinder
         (
@@ -45,7 +47,8 @@ namespace ActionInstaller
             IGameStateService gameStateService,
             IGameSceneService gameSceneService,
             IFinishLineService finishLineService,
-            ICoroutineService coroutineService
+            ICoroutineService coroutineService,
+            IRoguelikeRunService roguelikeRunService
         )
         {
             _playerService = playerService;
@@ -61,6 +64,7 @@ namespace ActionInstaller
             _finishLineService = finishLineService;
             _gameSceneService = gameSceneService;
             _coroutineService = coroutineService;
+            _roguelikeRunService = roguelikeRunService;
         }
 
         #endregion
@@ -79,6 +83,7 @@ namespace ActionInstaller
                 }
 
                 if (_gameStateService.GetIsOnline()) _roomService.LeaveRoom(true);
+                if (_roguelikeRunService.IsRunActive) _roguelikeRunService.EndRun();
                 _gameSceneService.BeginTransaction();
             });
 

@@ -9,6 +9,7 @@ using GameTypeService;
 using IAPurchasing;
 using IAPurchasing.Interfaces;
 using Network;
+using Roguelike;
 using Settings;
 using Settings.Interfaces;
 using Tutorial;
@@ -36,6 +37,12 @@ public class BootstrapInstaller : MonoInstaller, IInitializable
         BindLanguage();
         BindDevMode();
         BindCollectionData();
+        BindRoguelike();
+    }
+
+    private void BindRoguelike()
+    {
+        Container.BindInterfacesAndSelfTo<RoguelikeRunController>().AsSingle();
     }
 
     private void BindCollectionData()

@@ -50,6 +50,11 @@ namespace Score
             _winScoreList.Remove(player);
         }
 
+        public void SetMaxScore(int player, int value)
+        {
+            _winScoreList[player] = Mathf.Max(1, value);
+        }
+
         public void ClearAllScore()
         {
             List<int> keyList = new List<int>(_currentScoreList.Keys);

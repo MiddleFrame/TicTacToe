@@ -21,6 +21,7 @@ using TurnTimer.Interfaces;
 using UIPages.Interfaces;
 using UnityEngine;
 using Zenject;
+using Roguelike.Interfaces;
 
 namespace GameState
 {
@@ -66,6 +67,8 @@ namespace GameState
         private readonly IGameSceneService _gameSceneService;
         private readonly INetworkEventService _networkEventService;
         private readonly IRechangerService _rechangerService;
+        private readonly IRoguelikeRunService _roguelikeRunService;
+        private readonly IRoguelikeUIService _roguelikeUIService;
 
         public GameplayManager
         (
@@ -91,7 +94,9 @@ namespace GameState
              IManaUIService manaUIService,
              IFieldService fieldService,
             INetworkEventService networkEventService,
-            IRechangerService rechangerService
+            IRechangerService rechangerService,
+            IRoguelikeRunService roguelikeRunService,
+            IRoguelikeUIService roguelikeUIService
             )
         {
             _aiService = aiService;
@@ -117,6 +122,8 @@ namespace GameState
             _gameSceneService = gameSceneService;
             _networkEventService = networkEventService;
             _rechangerService = rechangerService;
+            _roguelikeRunService = roguelikeRunService;
+            _roguelikeUIService = roguelikeUIService;
         }
 
         #endregion
@@ -152,6 +159,13 @@ namespace GameState
                             _playerService.AddPlayer(PlayerType.Human, _handPoolManipulator.CreateCardPull(2));
                             _scoreService.AddPlayer(2);
                             _playerService.SetOnlineId(_roomService.GetCurrentPlayerSide());
+                            break;
+                        case GameType.Roguelike:
+                            _isOnline = false;
+                            _playerService.AddPlayer(PlayerType.Human, _handPoolManipulator.CreateCardPull(1));
+                            _scoreService.AddPlayer(1);
+                            _playerService.AddPlayer(PlayerType.AI, _handPoolManipulator.CreateCardPull(2));
+                            _scoreService.AddPlayer(2);
                             break;
                     }
 
@@ -274,6 +288,11 @@ namespace GameState
                     _turnTimerService.StopTimer();
                     _inGameUIService.StopTimer();
                     _coroutineService.ClearQueue();
+                    if (_roguelikeRunService.IsRunActive)
+                    {
+                        HandleRoguelikeRoundOver();
+                        break;
+                    }
                     _scoreWinnerService.AddRoundWinner(_scoreWinnerService.GetRoundWinner());
                     if (_scoreWinnerService.IsExistGameWinner())
                     {
@@ -290,7 +309,18 @@ namespace GameState
                     _figureCount = 0;
                     _aiService.StopBotTurnForce();
                     _playerService.ResetCurrentPlayer();
-                    _fieldService.Initialization(_scoreWinnerService.GetRoundCount());
+                    if (_roguelikeRunService.IsRunActive)
+                    {
+                        _fieldService.InitializationWithSize(_roguelikeRunService.CurrentStage.BoardSize);
+                        _scoreService.SetMaxScore(1, _roguelikeRunService.CurrentStage.ScoreToWin);
+                        _scoreService.SetMaxScore(2, _roguelikeRunService.CurrentStage.ScoreToWin);
+                        _handPoolManipulator.SynchronizeDeck(
+                            _playerService.GetPlayers()[0], _roguelikeRunService.Deck);
+                    }
+                    else
+                    {
+                        _fieldService.Initialization(_scoreWinnerService.GetRoundCount());
+                    }
                     _coroutineService.ClearQueue();
                     _historyService.ClearHistory();
                     _effectService.ClearEffect();
@@ -304,7 +334,14 @@ namespace GameState
                     }
 
                     _manaService.SetBonusMana(0);
-                    _manaService.ResetMana(_scoreWinnerService.GetRoundCount());
+                    if (_roguelikeRunService.IsRunActive)
+                    {
+                        _manaService.SetMaximumMana(_roguelikeRunService.MaximumMana);
+                    }
+                    else
+                    {
+                        _manaService.ResetMana(_scoreWinnerService.GetRoundCount());
+                    }
                     _manaService.RestoreAllMana();
                     _manaUIService.UpdateManaUI();
 
@@ -330,16 +367,58 @@ namespace GameState
                     _inGameUIService.UpdatePlayerRP(
                         _scoreWinnerService.GetCountRoundWin(1),
                         _scoreWinnerService.GetCountRoundWin(2));
+                    if (_roguelikeRunService.IsRunActive)
+                    {
+                        SetGameplayState(GameplayState.None);
+                    }
+                    break;
+                case GameplayState.RoguelikeReward:
+                case GameplayState.RoguelikeGameOver:
                     break;
             }
         }
 
+        private void HandleRoguelikeRoundOver()
+        {
+            _aiService.StopBotTurnForce();
+            int winner = _scoreWinnerService.GetRoundWinner();
+            if (winner == -1)
+            {
+                _coroutineService.AddCoroutine(_inGameUIService.ShowRoundOverAnimation());
+                _coroutineService.AddCoroutine(SetStateQueueProcess(GameplayState.NewRound));
+                return;
+            }
+
+            if (winner == 1)
+            {
+                _roguelikeRunService.RegisterVictory();
+                bool firstVictory = _roguelikeRunService.Victories == 1;
+                SetGameplayState(GameplayState.RoguelikeReward);
+                _roguelikeUIService.ShowVictoryReward(firstVictory,
+                    () => SetGameplayState(GameplayState.NewRound));
+                return;
+            }
+
+            SetGameplayState(GameplayState.RoguelikeGameOver);
+            _roguelikeUIService.ShowDefeatSummary(() => _gameSceneService.BeginTransaction());
+        }
+
         private IEnumerator StartBotTurnAfterTurnAnimation()
         {
-            _aiService.StartBotTurn(_figureCount,
-                _scoreService.GetScore(_playerService.GetPlayers()[0].SideId),
-                _scoreService.GetScore(_playerService.GetPlayers()[1].SideId),
-                () => { SetGameplayState(GameplayState.NewTurn); });
+            if (_roguelikeRunService.IsRunActive)
+            {
+                _aiService.StartBotTurn(_roguelikeRunService.CurrentStage.EnemyTurn,
+                    _scoreService.GetScore(_playerService.GetPlayers()[0].SideId),
+                    _scoreService.GetScore(_playerService.GetPlayers()[1].SideId),
+                    () => { SetGameplayState(GameplayState.NewTurn); });
+            }
+            else
+            {
+                _aiService.StartBotTurn(_figureCount,
+                    _scoreService.GetScore(_playerService.GetPlayers()[0].SideId),
+                    _scoreService.GetScore(_playerService.GetPlayers()[1].SideId),
+                    () => { SetGameplayState(GameplayState.NewTurn); });
+            }
             yield return null;
         }
 

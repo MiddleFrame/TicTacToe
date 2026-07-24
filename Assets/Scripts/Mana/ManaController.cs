@@ -36,6 +36,13 @@ namespace Mana
         {
             _manapool +=mana;
         } 
+
+        public void SetMaximumMana(int mana)
+        {
+            _manapool = Mathf.Clamp(mana, MIN_MANA, MAX_MANA);
+            _bonusMana = 0;
+            _currentMana = Mathf.Min(_currentMana, _manapool);
+        }
         
         public int IncreaseMaxManaCallBack(int mana)
         {
