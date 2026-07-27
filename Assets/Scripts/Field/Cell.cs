@@ -1,4 +1,5 @@
 using System.Collections;
+using AudioSystem;
 using Coroutine.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,12 +20,17 @@ public class Cell : MonoBehaviour
 
     private ICoroutineService _coroutineService;
     private IThemeService _themeService;
+    private IAudioService _audioService;
     
     [Inject]
-    private void Construct(ICoroutineService coroutineService,IThemeService themeService)
+    private void Construct(
+        ICoroutineService coroutineService,
+        IThemeService themeService,
+        IAudioService audioService)
     {
         _coroutineService = coroutineService;
         _themeService = themeService;
+        _audioService = audioService;
     }
 
     #endregion
@@ -85,6 +91,9 @@ public class Cell : MonoBehaviour
     private Image _subImage;
     [SerializeField]
     private Image _highlightImage;
+    [SerializeField]
+    [Tooltip("Selects both the figure reveal animation and its matching sound preset.")]
+    private FigurePlacementAnimationType _figurePlacementAnimation = FigurePlacementAnimationType.Scale;
     private Canvas _parentCanvas;
 
     void Awake()
@@ -379,36 +388,58 @@ public class Cell : MonoBehaviour
     }
 
     private IEnumerator IFigureFillProcess(CellFigure s, bool reverse, int animationVersion)
-    /*
-    {        
-        if (!reverse)
-        {
-            _image.sprite = _themeService.GetSprite(s);
+    {
+        IEnumerator animation = _figurePlacementAnimation == FigurePlacementAnimationType.Fill
+            ? IFigureDrawProcess(s, reverse, animationVersion)
+            : IFigureScaleProcess(s, reverse, animationVersion);
+        yield return StartCoroutine(animation);
+    }
 
-        }
-        _isFigureCoroutineWork = true;
-        _image.fillAmount = (reverse) ? 1 : 0;
-        float step = 1 / FIGURE_COUNT_FRAME;
-        int i = 0;
-        while (i <FIGURE_COUNT_FRAME)
+    private IEnumerator IFigureDrawProcess(CellFigure s, bool reverse, int animationVersion)
+    {
+        if (animationVersion != _figureAnimationVersion) yield break;
+
+        if (reverse)
         {
-            _image.fillAmount += (reverse) ? -step : step;
-            i++;
+            _figure = s;
+            _image.sprite = _themeService.GetSprite(s);
+            _image.fillAmount = 1f;
+            yield break;
+        }
+
+        _image.rectTransform.localScale = Vector3.one;
+        _image.sprite = _themeService.GetSprite(s);
+        _image.fillAmount = 0f;
+        _isFigureCoroutineWork = true;
+        _audioService.Play(SoundPresetIds.FigurePlaceFill);
+
+        float step = 1f / FIGURE_COUNT_FRAME;
+        for (int i = 0; i < FIGURE_COUNT_FRAME; i++)
+        {
+            if (animationVersion != _figureAnimationVersion)
+            {
+                _isFigureCoroutineWork = false;
+                yield break;
+            }
+
+            _image.fillAmount += step;
             yield return null;
         }
-        _image.fillAmount = (reverse) ? 0 : 1;
-        if (reverse) _image.sprite = _themeService.GetSprite(s);
+
+        _image.fillAmount = 1f;
         _isFigureCoroutineWork = false;
         _figure = s;
+    }
 
-    }*/
-
-
-
+    private IEnumerator IFigureScaleProcess(CellFigure s, bool reverse, int animationVersion)
     {
         if (animationVersion != _figureAnimationVersion) yield break;
         if (!reverse)
+        {
             _image.sprite = _themeService.GetSprite(s);
+            _image.fillAmount = 1f;
+            _audioService.Play(SoundPresetIds.FigurePlaceScale);
+        }
         else
         {
             if (animationVersion != _figureAnimationVersion) yield break;
@@ -525,5 +556,11 @@ public enum CellFigure
     None = 0,
     P1 = 1,
     P2 = 2
+}
+
+public enum FigurePlacementAnimationType
+{
+    Fill = 0,
+    Scale = 1
 }
 

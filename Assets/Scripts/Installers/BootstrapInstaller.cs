@@ -1,4 +1,5 @@
 ﻿using Analytic;
+using AudioSystem;
 using CardCollection;
 using Cards;
 using Coin;
@@ -25,6 +26,7 @@ public class BootstrapInstaller : MonoInstaller, IInitializable
     public override void InstallBindings()
     {
         BindInstaller();
+        BindAudio();
         BindDeckData();
         BindGameScene();
         BindVibration();
@@ -38,6 +40,15 @@ public class BootstrapInstaller : MonoInstaller, IInitializable
         BindDevMode();
         BindCollectionData();
         BindRoguelike();
+    }
+
+    private void BindAudio()
+    {
+        Container.BindInterfacesAndSelfTo<AudioManager>()
+            .FromNewComponentOnNewGameObject()
+            .WithGameObjectName("[Audio]")
+            .AsSingle()
+            .NonLazy();
     }
 
     private void BindRoguelike()

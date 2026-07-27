@@ -180,6 +180,16 @@ namespace Installers
 
         private void BindCellClearAnimation()
         {
+            // Resolving regular services during Zenject's dry-run returns a validation
+            // marker. Bind the default implementation so the full scene graph,
+            // including its audio dependency, can still be validated.
+            if (Container.IsValidating)
+            {
+                Container.Bind<FinishLineLineCellAnimation>().AsSingle().NonLazy();
+                Container.Bind<ICellClearAnimationService>().To<FlyingToScoreCellAnimation>().AsSingle();
+                return;
+            }
+
             ISettingsDataService settingsDataService = Container.Resolve<ISettingsDataService>();
             switch (settingsDataService.GetCellClearAnimationType())
             {

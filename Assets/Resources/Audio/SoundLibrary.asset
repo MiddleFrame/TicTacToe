@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97066dfd4b20dfb40ab0d196f34412b8, type: 3}
+  m_Name: SoundLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::AudioSystem.SoundLibrary
+  _presets:
+  - Id: ui.click
+    Clips:
+    - {fileID: 8300000, guid: 14c8dd0964cf5a74d89e5842757ef74f, type: 3}
+    - {fileID: 8300000, guid: c1cabd984d18199428c1c4a1e801c131, type: 3}
+    Volume: 0.38
+    PitchMin: 0.99
+    PitchMax: 1.01
+    Cooldown: 0.025
+    MaxSimultaneousVoices: 3
+  - Id: figure.place.fill
+    Clips:
+    - {fileID: 8300000, guid: 8d67b97a71e307842932a02ef30ac338, type: 3}
+    - {fileID: 8300000, guid: 91bdbe45f99c526439796cb556ffc531, type: 3}
+    Volume: 0.32
+    PitchMin: 0.97
+    PitchMax: 1.03
+    Cooldown: 0.035
+    MaxSimultaneousVoices: 4
+  - Id: figure.place.scale
+    Clips:
+    - {fileID: 8300000, guid: a28006b7744eed34d8dfa9052282d3f8, type: 3}
+    - {fileID: 8300000, guid: 562044643be7d0f40b3b02e39ea80505, type: 3}
+    Volume: 0.52
+    PitchMin: 0.97
+    PitchMax: 1.03
+    Cooldown: 0.035
+    MaxSimultaneousVoices: 5
+  - Id: damage.erase
+    Clips:
+    - {fileID: 8300000, guid: cf01764d578858141b061ee0cc0b3663, type: 3}
+    - {fileID: 8300000, guid: 7770411d8f740c64a9a93f3a5947fb7c, type: 3}
+    Volume: 0.31
+    PitchMin: 0.96
+    PitchMax: 1.03
+    Cooldown: 0.08
+    MaxSimultaneousVoices: 2
+  - Id: damage.impact
+    Clips:
+    - {fileID: 8300000, guid: 349e048c04f5a1341aeb16a0f292fcae, type: 3}
+    - {fileID: 8300000, guid: 51061c99788668744af11b1ed22d6c37, type: 3}
+    - {fileID: 8300000, guid: 67e9f90911f29eb4292a277e70af27dd, type: 3}
+    Volume: 0.46
+    PitchMin: 0.94
+    PitchMax: 1.06
+    Cooldown: 0.045
+    MaxSimultaneousVoices: 4
+  _backgroundMusic: {fileID: 8300000, guid: c6a9ba48669bb4143b20b65a29c27ceb, type: 3}
+  _backgroundMusicVolume: 0.24

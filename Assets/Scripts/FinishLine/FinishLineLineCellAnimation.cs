@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AudioSystem;
 using Field.Interfaces;
 using FinishLine.Interfaces;
 using Players.Interfaces;
@@ -16,17 +17,20 @@ namespace FinishLine
         private readonly IScoreService _scoreService;
         private readonly IFieldFigureService _fieldFigureService;
         private readonly IInGameUIService _inGameUIService;
+        private readonly IAudioService _audioService;
 
         public FinishLineLineCellAnimation(
             IPlayerService playerService,
             IScoreService scoreService,
             IFieldFigureService fieldFigureService,
-            IInGameUIService inGameUIService)
+            IInGameUIService inGameUIService,
+            IAudioService audioService)
         {
             _playerService = playerService;
             _scoreService = scoreService;
             _fieldFigureService = fieldFigureService;
             _inGameUIService = inGameUIService;
+            _audioService = audioService;
         }
 
         public float AnimationFrames => FinishLineObject.FINISH_COUNT_FRAME;
@@ -38,6 +42,7 @@ namespace FinishLine
 
             foreach (List<Vector2Int> line in lines)
             {
+                _audioService.Play(SoundPresetIds.DamageErase);
                 int lineScore = 0;
 
                 foreach (Vector2Int cell in line)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using AudioSystem;
 using Field.Interfaces;
 using FinishLine.Interfaces;
 using Players.Interfaces;
@@ -31,6 +32,7 @@ namespace FinishLine
         private readonly IFieldFigureService _fieldFigureService;
         private readonly IInGameUIService _inGameUIService;
         private readonly IThemeService _themeService;
+        private readonly IAudioService _audioService;
 
         public FlyingToScoreCellAnimation(
             IPlayerService playerService,
@@ -38,7 +40,8 @@ namespace FinishLine
             IFieldService fieldService,
             IFieldFigureService fieldFigureService,
             IInGameUIService inGameUIService,
-            IThemeService themeService)
+            IThemeService themeService,
+            IAudioService audioService)
         {
             _playerService = playerService;
             _scoreService = scoreService;
@@ -46,6 +49,7 @@ namespace FinishLine
             _fieldFigureService = fieldFigureService;
             _inGameUIService = inGameUIService;
             _themeService = themeService;
+            _audioService = audioService;
         }
 
         public float AnimationFrames => 3f;
@@ -276,6 +280,7 @@ namespace FinishLine
                     {
                         if (!icon.IsScored)
                         {
+                            _audioService.Play(SoundPresetIds.DamageImpact);
                             _scoreService.AddScore(icon.ScoreSide, 1);
                             _inGameUIService.UpdateScore(_scoreService.GetScore(1), _scoreService.GetScore(2));
                             icon.IsScored = true;
@@ -294,6 +299,7 @@ namespace FinishLine
                 FlyingIconData icon = icons[i];
                 if (!icon.IsScored)
                 {
+                    _audioService.Play(SoundPresetIds.DamageImpact);
                     _scoreService.AddScore(icon.ScoreSide, 1);
                     _inGameUIService.UpdateScore(_scoreService.GetScore(1), _scoreService.GetScore(2));
                     icon.IsScored = true;

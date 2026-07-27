@@ -1,4 +1,5 @@
 ﻿using Analytic.Interfaces;
+using AudioSystem;
 using Cards.Interfaces;
 using Coin.Interfaces;
 using DevMode.Interfaces;
@@ -37,6 +38,9 @@ namespace UIPages
         [Header("Settings properties"), SerializeField]
         private TMP_Dropdown _cellClearAnimationDropdown;
 
+        [SerializeField]
+        private Button _soundsButton;
+
         [Header("Dev mode properties"), SerializeField]
         private Button _enableDevModeButton;
 
@@ -59,6 +63,7 @@ namespace UIPages
         private ISettingsDataService _settingsDataService;
         private IDevModeService _devModeService;
         private IRoguelikeRunService _roguelikeRunService;
+        private IAudioService _audioService;
 
         [Inject]
         private void Construct(ICardList cardList, ICoinService coinService,
@@ -67,7 +72,8 @@ namespace UIPages
             ITutorialCompleteService tutorialCompleteService,
             ISettingsDataService settingsDataService,
             IDevModeService devModeService,
-            IRoguelikeRunService roguelikeRunService)
+            IRoguelikeRunService roguelikeRunService,
+            IAudioService audioService)
         {
             _cardList = cardList;
             _coinService = coinService;
@@ -78,6 +84,7 @@ namespace UIPages
             _settingsDataService = settingsDataService;
             _devModeService = devModeService;
             _roguelikeRunService = roguelikeRunService;
+            _audioService = audioService;
         }
 
         #endregion
@@ -90,12 +97,15 @@ namespace UIPages
 
         private void Start()
         {
-            UpdateNetworkUI(_isConnectedToMasterState);
+            // Photon now connects lazily when matchmaking starts, so a disconnected
+            // client in the main menu is the normal state.
+            UpdateNetworkUI(true);
             Debug.Log($"TutorialManager.IsTutorialShowed {_tutorialCompleteService.GetIsTutorialComplete()}");
             _tutorialShowedArea.SetActive(_tutorialCompleteService.GetIsTutorialComplete());
             _tutorialNotShowedArea.SetActive(!_tutorialCompleteService.GetIsTutorialComplete());
             SyncCellClearAnimationDropdown();
             SyncDevModeButtons();
+            SyncSoundsButton();
         }
 
         private void OnEnable()
@@ -104,6 +114,7 @@ namespace UIPages
             UpdateTexts();
             SyncCellClearAnimationDropdown();
             SyncDevModeButtons();
+            SyncSoundsButton();
         }
 
         private void OnDisable()
@@ -207,6 +218,24 @@ namespace UIPages
         {
             if (_cellClearAnimationDropdown == null) return;
             _cellClearAnimationDropdown.SetValueWithoutNotify(GetCellClearAnimationType());
+        }
+
+        public void ToggleSounds()
+        {
+            bool muted = !_audioService.IsMuted;
+            _audioService.SetMuted(muted);
+            SyncSoundsButton();
+
+            if (!muted) _audioService.Play(SoundPresetIds.UiClick);
+        }
+
+        private void SyncSoundsButton()
+        {
+            if (_soundsButton == null) return;
+
+            CanvasGroup group = _soundsButton.GetComponent<CanvasGroup>();
+            if (group == null) group = _soundsButton.gameObject.AddComponent<CanvasGroup>();
+            group.alpha = _audioService.IsMuted ? 0.45f : 1f;
         }
 
         public void EnableDevModeButtonClick()

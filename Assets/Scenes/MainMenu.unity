@@ -290,7 +290,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument:
           m_BoolArgument: 0
         m_CallState: 2
   m_AlphaFadeSpeed: 0.15
@@ -10490,6 +10490,7 @@ MonoBehaviour:
   _tutorialShowedArea: {fileID: 596634560}
   _tutorialNotShowedArea: {fileID: 1030593928}
   _cellClearAnimationDropdown: {fileID: 30737256}
+  _soundsButton: {fileID: 2136105826}
   _enableDevModeButton: {fileID: 188369641}
   _disableDevModeButton: {fileID: 544242895}
   _devModePasswordPopup: {fileID: 63737062}
@@ -25662,7 +25663,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2136105824}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 891755666}
+        m_TargetAssemblyTypeName: MainMenuUI, Assembly-CSharp
+        m_MethodName: ToggleSounds
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2139763707
 GameObject:
   m_ObjectHideFlags: 0

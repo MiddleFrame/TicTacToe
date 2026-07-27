@@ -213,6 +213,7 @@ MonoBehaviour:
   _image: {fileID: 1660096489882150304}
   _subImage: {fileID: 1634811433493738619}
   _highlightImage: {fileID: 6556601028829430976}
+  _figurePlacementAnimation: 1
 --- !u!1 &8280326175201674531
 GameObject:
   m_ObjectHideFlags: 0

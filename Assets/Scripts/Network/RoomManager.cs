@@ -14,7 +14,7 @@ namespace Network
     public class RoomManager : MonoBehaviourPunCallbacks, IRoomService
     {
         private Action<bool,int> _onPlayerLeaveAction;
-        
+
         public bool GetIsOwnRoom()
         {
             return PhotonNetwork.IsMasterClient;
@@ -35,12 +35,14 @@ namespace Network
         public void LeaveRoom(bool isPreExit)
         {
             if (!PhotonNetwork.InRoom) return;
-            Hashtable hash = new Hashtable();
-            hash.Add("isPreExit", isPreExit);
-            PhotonNetwork.LocalPlayer.CustomProperties = hash;
+
+            Hashtable hash = new Hashtable
+            {
+                {"isPreExit", isPreExit}
+            };
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
             Debug.Log(PhotonNetwork.LocalPlayer.CustomProperties["isPreExit"]);
-            PhotonNetwork.LeaveRoom();
+            PhotonConnectionLifecycle.LeaveRoomAndDisconnect();
         }
 
         public void SetPlayerLeaveAction(Action<bool,int> action)

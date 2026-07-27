@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Analytic.Interfaces;
 using Cards.Interfaces;
 using GameScene;
@@ -9,11 +7,10 @@ using GameTypeService.Interfaces;
 using Network.Interfaces;
 using Photon.Pun;
 using Photon.Realtime;
-using UIPages.Interfaces;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using Vibration.Interfaces;
 using Zenject;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Random = UnityEngine.Random;
 
 namespace Network
@@ -21,6 +18,10 @@ namespace Network
     public class MasterConnectorManager : MonoBehaviourPunCallbacks, IMasterConnectorService
     {
         private bool isConnected;
+        private bool _isSearchRequested;
+        private bool _isJoinRequestSent;
+        private bool _connectAfterDisconnect;
+        private bool _isLoadingGame;
 
         #region Dependency
 
@@ -29,91 +30,151 @@ namespace Network
         private IMatchEventsAnalyticService _matchEventsAnalyticService;
         private IGameSceneService _gameSceneService;
         private IGameTypeService _gameTypeService;
-        private IMainMenuState _mainMenuUIService;
 
         [Inject]
         private void Construct(ICardList cardList, IVibrationService vibrationService,
             IMatchEventsAnalyticService matchEventsAnalyticService, IGameSceneService gameSceneService,
-            IGameTypeService gameTypeService, IMainMenuState mainMenuUIService)
+            IGameTypeService gameTypeService)
         {
             _cardList = cardList;
             _vibrationService = vibrationService;
             _matchEventsAnalyticService = matchEventsAnalyticService;
             _gameSceneService = gameSceneService;
             _gameTypeService = gameTypeService;
-            _mainMenuUIService = mainMenuUIService;
         }
 
         #endregion
 
-        void Start()
+        private void Start()
         {
-            ConnectToMaster();
+            isConnected = PhotonNetwork.IsConnectedAndReady;
+
+            // A multiplayer connection should not remain active while the player is
+            // simply sitting in the main menu.
+            if (PhotonNetwork.IsConnected && !PhotonNetwork.InRoom)
+                PhotonNetwork.Disconnect();
         }
 
         private void ConnectToMaster()
         {
             isConnected = PhotonNetwork.IsConnectedAndReady;
-            _mainMenuUIService.SetIsConnectedToMaster(isConnected);
-            if (!isConnected && PhotonNetwork.NetworkClientState != ClientState.Leaving)
+
+            if (isConnected)
             {
-                PhotonNetwork.NickName = "Player" + Random.Range(1000, 9999);
-                PhotonNetwork.GameVersion = Application.version;
-                PhotonNetwork.ConnectUsingSettings();
-                PhotonNetwork.ConnectToRegion("us");
-                //isConnected = PhotonNetwork.IsConnectedAndReady;
+                StartMatchmaking();
+                return;
             }
+
+            ClientState state = PhotonNetwork.NetworkClientState;
+            if (state == ClientState.Disconnecting || state == ClientState.Leaving ||
+                state == ClientState.DisconnectingFromGameServer)
+            {
+                _connectAfterDisconnect = true;
+                return;
+            }
+
+            if (state != ClientState.PeerCreated && state != ClientState.Disconnected)
+                return;
+
+            PhotonNetwork.NickName = "Player" + Random.Range(1000, 9999);
+
+            // Use a copied settings object so ConnectUsingSettings initializes the
+            // AppId/protocol correctly while still pinning matchmaking to one region.
+            AppSettings appSettings = PhotonNetwork.PhotonServerSettings.AppSettings.CopyTo(new AppSettings());
+            appSettings.FixedRegion = "us";
+            appSettings.AppVersion = Application.version;
+
+            if (!PhotonNetwork.ConnectUsingSettings(appSettings))
+                Debug.LogError("Could not start connection to the Photon master server.");
         }
-        
+
         public void StartSearchRoom()
         {
-            PhotonNetwork.JoinRandomOrCreateRoom(roomName: Random.Range(1000, 9999).ToString(),
+            if (_isSearchRequested || _isLoadingGame)
+                return;
+
+            _isSearchRequested = true;
+            _isJoinRequestSent = false;
+            ConnectToMaster();
+            Debug.Log("Multiplayer search requested.");
+        }
+
+        private void StartMatchmaking()
+        {
+            if (!_isSearchRequested || _isJoinRequestSent || !PhotonNetwork.IsConnectedAndReady)
+                return;
+
+            _isJoinRequestSent = PhotonNetwork.JoinRandomOrCreateRoom(
+                roomName: Random.Range(1000, 9999).ToString(),
                 roomOptions: new RoomOptions {MaxPlayers = 2});
-            Debug.Log("Start search!");
+
+            if (!_isJoinRequestSent)
+            {
+                Debug.LogError("Photon rejected the matchmaking request.");
+                StopSearch();
+            }
         }
 
         public void StopSearch()
         {
-            if (PhotonNetwork.InRoom) PhotonNetwork.LeaveRoom();
-            else CancelJoinRoom();
+            _isSearchRequested = false;
+            _isJoinRequestSent = false;
+            _connectAfterDisconnect = false;
+
+            if (PhotonNetwork.InRoom)
+                PhotonConnectionLifecycle.LeaveRoomAndDisconnect();
+            else if (PhotonNetwork.NetworkClientState != ClientState.PeerCreated &&
+                     PhotonNetwork.NetworkClientState != ClientState.Disconnected)
+                PhotonNetwork.Disconnect();
+
             isConnected = PhotonNetwork.IsConnectedAndReady;
-            _mainMenuUIService.SetIsConnectedToMaster(isConnected);
         }
 
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             base.OnPlayerEnteredRoom(newPlayer);
-            Debug.Log("Async enter room");
-            Debug.Log("Connect player!");
-            if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-            {
-                if (PhotonNetwork.IsMasterClient) PhotonNetwork.CurrentRoom.IsOpen = false;
-                _gameTypeService.SetGameType(GameType.MultiplayerHuman);
-
-                _vibrationService.Vibrate(500);
-                _matchEventsAnalyticService.Player_Found_Match(SearchingEnemyWindow.TimePass);
-                _matchEventsAnalyticService.Player_Start_Match(GameType.MultiplayerHuman, _cardList.GetCardList());
-                _gameSceneService.BeginLoadGameScene(GameSceneManager.GameScene.Game);
-                _gameSceneService.BeginTransaction();
-            }
+            TryStartMultiplayerMatch();
         }
 
         public override void OnJoinedRoom()
         {
             base.OnJoinedRoom();
-            Debug.Log("Async enter room");
-            Debug.Log("Connect player!");
-            if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-            {
-                if (PhotonNetwork.IsMasterClient) PhotonNetwork.CurrentRoom.IsOpen = false;
-                _gameTypeService.SetGameType(GameType.MultiplayerHuman);
+            _isJoinRequestSent = false;
 
-                _vibrationService.Vibrate(500);
-                _matchEventsAnalyticService.Player_Found_Match(SearchingEnemyWindow.TimePass);
-                _matchEventsAnalyticService.Player_Start_Match(GameType.MultiplayerHuman, _cardList.GetCardList());
-                _gameSceneService.BeginLoadGameScene(GameSceneManager.GameScene.Game);
-                _gameSceneService.BeginTransaction();
+            if (!_isSearchRequested)
+            {
+                PhotonConnectionLifecycle.LeaveRoomAndDisconnect();
+                return;
             }
+
+            TryStartMultiplayerMatch();
+        }
+
+        private void TryStartMultiplayerMatch()
+        {
+            if (!_isSearchRequested || _isLoadingGame || !PhotonNetwork.InRoom ||
+                PhotonNetwork.CurrentRoom.PlayerCount != 2)
+                return;
+
+            _isLoadingGame = true;
+            _isSearchRequested = false;
+
+            if (PhotonNetwork.IsMasterClient)
+                PhotonNetwork.CurrentRoom.IsOpen = false;
+
+            // The value is changed to false only for a normal completed match.
+            // A manual/abrupt exit therefore remains distinguishable to the opponent.
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable
+            {
+                {"isPreExit", true}
+            });
+
+            _gameTypeService.SetGameType(GameType.MultiplayerHuman);
+            _vibrationService.Vibrate(500);
+            _matchEventsAnalyticService.Player_Found_Match(SearchingEnemyWindow.TimePass);
+            _matchEventsAnalyticService.Player_Start_Match(GameType.MultiplayerHuman, _cardList.GetCardList());
+            _gameSceneService.BeginLoadGameScene(GameSceneManager.GameScene.Game);
+            _gameSceneService.BeginTransaction();
         }
 
         public override void OnConnectedToMaster()
@@ -121,22 +182,45 @@ namespace Network
             base.OnConnectedToMaster();
             Debug.Log("Connected" + PhotonNetwork.NickName);
             isConnected = PhotonNetwork.IsConnectedAndReady;
-            _mainMenuUIService.SetIsConnectedToMaster(isConnected);
+            _connectAfterDisconnect = false;
+            StartMatchmaking();
         }
 
-        private async void CancelJoinRoom()
+        public override void OnDisconnected(DisconnectCause cause)
         {
-            Debug.Log("Async enter");
-            while (!PhotonNetwork.InRoom)
-            {
-                Debug.Log("Async wait");
-                await Task.Yield();
-            }
+            base.OnDisconnected(cause);
+            isConnected = false;
+            _isJoinRequestSent = false;
 
-            PhotonNetwork.LeaveRoom();
-            Debug.Log("Async end");
-            isConnected = PhotonNetwork.IsConnectedAndReady;
-            _mainMenuUIService.SetIsConnectedToMaster(isConnected);
+            if (_isSearchRequested && _connectAfterDisconnect)
+            {
+                _connectAfterDisconnect = false;
+                ConnectToMaster();
+            }
+        }
+
+        public override void OnJoinRandomFailed(short returnCode, string message)
+        {
+            base.OnJoinRandomFailed(returnCode, message);
+            HandleMatchmakingFailure(returnCode, message);
+        }
+
+        public override void OnJoinRoomFailed(short returnCode, string message)
+        {
+            base.OnJoinRoomFailed(returnCode, message);
+            HandleMatchmakingFailure(returnCode, message);
+        }
+
+        public override void OnCreateRoomFailed(short returnCode, string message)
+        {
+            base.OnCreateRoomFailed(returnCode, message);
+            HandleMatchmakingFailure(returnCode, message);
+        }
+
+        private void HandleMatchmakingFailure(short returnCode, string message)
+        {
+            Debug.LogError($"Matchmaking failed ({returnCode}): {message}");
+            StopSearch();
         }
 
         private void Update()
@@ -160,7 +244,8 @@ namespace Network
         private void OnApplicationPause(bool pauseStatus)
         {
             Debug.Log($"Pause {pauseStatus}");
-            if (!pauseStatus) ConnectToMaster();
+            if (!pauseStatus && _isSearchRequested)
+                ConnectToMaster();
         }
 
         public bool GetIsConnectedToMaster()
