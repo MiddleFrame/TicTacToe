@@ -1,0 +1,5 @@
+<linker>
+  <!-- Zenject creates installers and calls injected services through reflection. -->
+  <assembly fullname="Zenject" preserve="all" />
+  <assembly fullname="Assembly-CSharp" preserve="all" />
+</linker>

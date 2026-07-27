@@ -190,76 +190,215 @@ def periodic_frequency(frequency: float, duration: float) -> float:
     return round(frequency * duration) / duration
 
 
+def make_kick(seed: int) -> list[float]:
+    rng = random.Random(seed)
+    duration = 0.22
+    count = int(duration * SAMPLE_RATE)
+    phase = 0.0
+    result: list[float] = []
+    for index in range(count):
+        t = index / SAMPLE_RATE
+        frequency = 48.0 + 62.0 * math.exp(-t * 32.0)
+        phase += TAU * frequency / SAMPLE_RATE
+        body = math.sin(phase) * math.exp(-t * 19.0)
+        contact = rng.uniform(-1.0, 1.0) * math.exp(-t * 150.0)
+        result.append((0.82 * body + 0.08 * contact) * smoothstep((duration - t) / 0.04))
+    return result
+
+
+def make_wood_rim(seed: int) -> list[float]:
+    rng = random.Random(seed)
+    duration = 0.105
+    count = int(duration * SAMPLE_RATE)
+    phases = [rng.uniform(0.0, TAU) for _ in range(3)]
+    frequencies = (285.0, 465.0, 710.0)
+    low_noise = 0.0
+    result: list[float] = []
+    for index in range(count):
+        t = index / SAMPLE_RATE
+        noise = rng.uniform(-1.0, 1.0)
+        low_noise += 0.10 * (noise - low_noise)
+        transient = (noise - low_noise) * math.exp(-t * 180.0)
+        wood = sum(
+            math.sin(TAU * frequency * t + phase)
+            for frequency, phase in zip(frequencies, phases)
+        ) / len(frequencies)
+        result.append(
+            (0.34 * wood * math.exp(-t * 47.0) + 0.20 * transient)
+            * smoothstep((duration - t) / 0.025)
+        )
+    return result
+
+
+def make_brushed_hat(seed: int, duration: float = 0.055) -> list[float]:
+    rng = random.Random(seed)
+    count = int(duration * SAMPLE_RATE)
+    low = 0.0
+    result: list[float] = []
+    for index in range(count):
+        t = index / SAMPLE_RATE
+        noise = rng.uniform(-1.0, 1.0)
+        low += 0.24 * (noise - low)
+        high = noise - low
+        result.append(
+            high
+            * math.exp(-t * 55.0)
+            * smoothstep((duration - t) / 0.018)
+        )
+    return result
+
+
+def make_muted_bass(frequency: float, seed: int) -> list[float]:
+    rng = random.Random(seed)
+    duration = 0.32
+    count = int(duration * SAMPLE_RATE)
+    phase = rng.uniform(0.0, TAU)
+    result: list[float] = []
+    for index in range(count):
+        t = index / SAMPLE_RATE
+        pitch = frequency * (1.0 + 0.018 * math.exp(-t * 25.0))
+        phase += TAU * pitch / SAMPLE_RATE
+        tone = math.sin(phase) + 0.12 * math.sin(phase * 2.0 + 0.4)
+        gain = smoothstep(t / 0.004) * math.exp(-t * 10.5)
+        result.append(tone * gain * smoothstep((duration - t) / 0.055))
+    return result
+
+
+def make_string_pluck(frequency: float, seed: int) -> list[float]:
+    rng = random.Random(seed)
+    duration = 0.48
+    count = int(duration * SAMPLE_RATE)
+    period = max(2, int(SAMPLE_RATE / frequency))
+    ring = [rng.uniform(-1.0, 1.0) for _ in range(period)]
+    result: list[float] = []
+    for index in range(count):
+        position = index % period
+        next_position = (position + 1) % period
+        current = ring[position]
+        ring[position] = 0.5 * (current + ring[next_position]) * 0.988
+        t = index / SAMPLE_RATE
+        pick = rng.uniform(-1.0, 1.0) * math.exp(-t * 115.0)
+        release = smoothstep((duration - t) / 0.07)
+        result.append((0.72 * current + 0.035 * pick) * release)
+    return result
+
+
+def mix_looped(
+    left: list[float],
+    right: list[float],
+    sound: list[float],
+    start_time: float,
+    pan: float,
+    gain: float,
+) -> None:
+    start = int(round(start_time * SAMPLE_RATE)) % len(left)
+    left_gain = gain * math.sqrt(0.5 * (1.0 - max(-1.0, min(1.0, pan))))
+    right_gain = gain * math.sqrt(0.5 * (1.0 + max(-1.0, min(1.0, pan))))
+    for offset, sample in enumerate(sound):
+        index = (start + offset) % len(left)
+        left[index] += sample * left_gain
+        right[index] += sample * right_gain
+
+
 def make_music() -> list[tuple[float, float]]:
     duration = 32.0
     count = int(duration * SAMPLE_RATE)
-    chord_centres = [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0]
-    chords = [
-        (164.81, 246.94, 329.63),
-        (146.83, 220.00, 293.66),
-        (130.81, 196.00, 246.94),
-        (146.83, 220.00, 329.63),
-        (164.81, 246.94, 293.66),
-        (130.81, 196.00, 293.66),
-        (146.83, 246.94, 329.63),
-        (164.81, 220.00, 293.66),
-    ]
-    melody = [329.63, 293.66, 246.94, 220.00, 246.94, 293.66, 196.00, 220.00,
-              329.63, 246.94, 293.66, 220.00, 196.00, 246.94, 293.66, 246.94]
-    chord_frequencies = [
-        tuple(periodic_frequency(frequency, duration) for frequency in chord)
-        for chord in chords
-    ]
-    melody_frequencies = [
-        periodic_frequency(frequency, duration) for frequency in melody
-    ]
-    drone_left = periodic_frequency(82.41, duration)
-    drone_right = periodic_frequency(123.47, duration)
-    result: list[tuple[float, float]] = []
+    left = [0.0] * count
+    right = [0.0] * count
+    beat = 0.5  # 120 BPM
+    bar_duration = beat * 4.0
 
-    for index in range(count):
-        t = index / SAMPLE_RATE
-        left = 0.0
-        right = 0.0
+    # C major / G / A minor / F major. The harmony is carried only by short
+    # notes, never by a continuous pad or drone.
+    progression = [
+        (130.81, (329.63, 392.00, 523.25, 392.00)),
+        (196.00, (293.66, 392.00, 493.88, 392.00)),
+        (220.00, (329.63, 440.00, 523.25, 440.00)),
+        (174.61, (261.63, 349.23, 440.00, 349.23)),
+    ]
 
-        # Quiet continuous foundation. Frequencies are quantized to whole loop cycles.
-        left += 0.075 * math.sin(TAU * drone_left * t)
-        right += 0.070 * math.sin(TAU * drone_right * t + 0.35)
+    kick = make_kick(710)
+    rim_a = make_wood_rim(720)
+    rim_b = make_wood_rim(721)
+    hats = [make_brushed_hat(730 + index) for index in range(4)]
+    bass_cache: dict[float, list[float]] = {}
+    pluck_cache: dict[tuple[float, int], list[float]] = {}
 
-        # Circular crossfades make the last chord blend into the first at the seam.
-        for chord_index, centre in enumerate(chord_centres):
-            distance = circular_distance(t, centre, duration)
-            if distance >= 4.0:
+    for bar in range(16):
+        bar_start = bar * bar_duration
+        root, notes = progression[bar % len(progression)]
+        phrase_bar = bar % 8
+
+        # A restrained groove with a short fill only at phrase boundaries.
+        mix_looped(left, right, kick, bar_start, -0.04, 0.26)
+        mix_looped(left, right, kick, bar_start + 2.0 * beat, 0.04, 0.21)
+        if phrase_bar in (3, 7):
+            mix_looped(left, right, kick, bar_start + 3.5 * beat, 0.10, 0.13)
+
+        mix_looped(left, right, rim_a, bar_start + beat, 0.14, 0.34)
+        mix_looped(left, right, rim_b, bar_start + 3.0 * beat, -0.12, 0.32)
+
+        for eighth in range(8):
+            # The first bar of each phrase is deliberately more open.
+            if phrase_bar in (0, 4) and eighth % 2 != 0:
                 continue
-            weight = 0.5 + 0.5 * math.cos(math.pi * distance / 4.0)
-            frequencies = chord_frequencies[chord_index]
-            left += weight * (
-                0.032 * math.sin(TAU * frequencies[0] * t + 0.2)
-                + 0.022 * math.sin(TAU * frequencies[2] * t + 1.1)
-            )
-            right += weight * (
-                0.030 * math.sin(TAU * frequencies[1] * t + 0.7)
-                + 0.020 * math.sin(TAU * frequencies[2] * t + 1.6)
+            hat_gain = 0.10 if eighth % 2 == 0 else 0.07
+            hat_pan = -0.24 if eighth % 2 == 0 else 0.24
+            mix_looped(
+                left,
+                right,
+                hats[eighth % len(hats)],
+                bar_start + eighth * beat * 0.5,
+                hat_pan,
+                hat_gain,
             )
 
-        # Muted two-second pulses; the final pulse tail wraps into the loop start.
-        for event_index, frequency in enumerate(melody_frequencies):
-            event_time = event_index * 2.0
-            age = (t - event_time) % duration
-            if age > 2.8:
+        for bass_index, (offset_beats, frequency, gain) in enumerate(
+            (
+                (0.0, root, 0.14),
+                (2.5, root * 1.5, 0.09),
+            )
+        ):
+            if frequency not in bass_cache:
+                bass_cache[frequency] = make_muted_bass(
+                    frequency,
+                    800 + bar % 4 * 10 + bass_index,
+                )
+            mix_looped(
+                left,
+                right,
+                bass_cache[frequency],
+                bar_start + offset_beats * beat,
+                -0.06 if bass_index == 0 else 0.08,
+                gain,
+            )
+
+        note_offsets = (0.75, 1.5, 2.75, 3.5)
+        for note_index, (offset_beats, frequency) in enumerate(zip(note_offsets, notes)):
+            # Keep the phrase opening sparse, then let the motif develop.
+            if phrase_bar in (0, 4) and note_index in (1, 3):
                 continue
-            pulse = math.exp(-age * 2.15) * smoothstep(age / 0.018)
-            tone = math.sin(TAU * frequency * age)
-            overtone = 0.16 * math.sin(TAU * frequency * 2.0 * age + 0.4)
-            pan = -0.22 if event_index % 2 == 0 else 0.22
-            left += pulse * (tone + overtone) * 0.026 * (1.0 - pan)
-            right += pulse * (tone + overtone) * 0.026 * (1.0 + pan)
+            cache_key = (frequency, note_index)
+            if cache_key not in pluck_cache:
+                pluck_cache[cache_key] = make_string_pluck(
+                    frequency,
+                    900 + int(frequency) + note_index,
+                )
+            mix_looped(
+                left,
+                right,
+                pluck_cache[cache_key],
+                bar_start + offset_beats * beat,
+                -0.30 + note_index * 0.20,
+                0.29 if note_index < 2 else 0.25,
+            )
 
-        # Very small periodic breathing keeps the bed alive without dramatic changes.
-        breath = 0.91 + 0.09 * math.sin(TAU * t / 8.0 - math.pi / 2.0)
-        result.append((left * breath, right * breath))
-
-    return result
+    # A touch of soft saturation controls coincident transients without
+    # flattening the dynamics.
+    return [
+        (math.tanh(sample_left * 1.15), math.tanh(sample_right * 1.15))
+        for sample_left, sample_right in zip(left, right)
+    ]
 
 
 def main() -> None:
@@ -279,7 +418,7 @@ def main() -> None:
     for path, samples in assets.items():
         write_mono(path, samples)
 
-    write_stereo(MUSIC_DIR / "minimal_background_loop.wav", make_music(), peak=0.58)
+    write_stereo(MUSIC_DIR / "minimal_background_loop.wav", make_music(), peak=0.50)
     print(f"Generated {len(assets)} SFX and 1 seamless music loop.")
 
 
